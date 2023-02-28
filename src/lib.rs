@@ -9,7 +9,7 @@ pub async fn run() {
     listen_to_event(
         "DarumaDockerDev",
         "github-func-test",
-        vec!["issue_comment"],
+        vec!["issue_comment", "issue"],
         handler,
     )
     .await;
@@ -24,7 +24,7 @@ async fn handler(payload: EventPayload) {
 
         let _reaction = octo
             .issues("DarumaDockerDev", "github-func-test")
-            .create_reaction(issue_number, ReactionContent::Rocket)
+            .create_comment_reaction(issue_number, ReactionContent::Rocket)
             .await
             .unwrap();
     };
