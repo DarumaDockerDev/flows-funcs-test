@@ -7,9 +7,9 @@ use github_flows::{
 #[tokio::main(flavor = "current_thread")]
 pub async fn run() {
     listen_to_event(
-        "DarumaDockerDev",
+        "DarumaDockerOrg",
         "github-func-test",
-        vec!["issue_comment", "issue"],
+        vec!["issue_comment"],
         handler,
     )
     .await;
@@ -20,10 +20,10 @@ async fn handler(payload: EventPayload) {
         let issue_number = e.comment.id.0;
 
         // installed app login
-        let octo = get_octo(Some(String::from("DarumaDockerDev")));
+        let octo = get_octo(Some(String::from("DarumaDockerOrg")));
 
         let _reaction = octo
-            .issues("DarumaDockerDev", "github-func-test")
+            .issues("DarumaDockerOrg", "github-func-test")
             .create_comment_reaction(issue_number, ReactionContent::Rocket)
             .await
             .unwrap();
