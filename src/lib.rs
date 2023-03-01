@@ -65,6 +65,7 @@ fn react(s: &str) -> ReactionContent {
         ..Default::default()
     };
     let mut r = create_completion("Michael", cr);
+    send_message_to_channel("reactor-space", "t1", format!("{:?}", r));
     match r.pop().unwrap_or_default().as_str() {
         "positive" => ReactionContent::Hooray,
         "neutral" => ReactionContent::Heart,
