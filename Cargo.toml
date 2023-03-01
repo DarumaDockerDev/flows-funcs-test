@@ -10,5 +10,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 github-flows = "0.2"
+openai-flows = "0.1.2"
 slack-flows = "0.2"
 tokio_wasi = "1.25.1"
