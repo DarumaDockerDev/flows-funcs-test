@@ -17,7 +17,7 @@ pub async fn run() {
 }
 
 async fn handler(payload: EventPayload) {
-    let octo = get_octo(Some(String::from("DarumaDockerOrg")));
+    let octo = get_octo(Some(String::from("DarumaDocker")));
     let issues = octo.issues("DarumaDockerOrg", "github-func-test");
 
     let reaction = match payload {
