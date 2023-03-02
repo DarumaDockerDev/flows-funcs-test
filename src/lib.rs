@@ -35,10 +35,7 @@ async fn handler(payload: EventPayload) {
             let comment_id = e.comment.id.0;
             Some(
                 issues
-                    .create_comment_reaction(
-                        comment_id,
-                        react(&e.comment.body_text.unwrap_or_default()),
-                    )
+                    .create_comment_reaction(comment_id, react(&e.comment.body.unwrap_or_default()))
                     .await,
             )
         }
