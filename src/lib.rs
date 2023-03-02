@@ -1,3 +1,4 @@
+use flowsnet_platform_sdk::write_error_log;
 use github_flows::{
     get_octo, listen_to_event,
     octocrab::models::{events::payload::EventPayload, reactions::ReactionContent},
@@ -53,15 +54,17 @@ async fn handler(payload: EventPayload) {
 }
 
 fn react(s: &str) -> ReactionContent {
+    let prompt = format!(
+        r#"
+        Decide whether a Tweet's sentiment is positive, neutral, or negative.
+        Tweet: "{}"
+        Sentiment:
+                "#,
+        s.replace("\"", "'")
+    );
+    write_error_log!(prompt);
     let cr = CompletionRequest {
-        prompt: format!(
-            r#"
-            Decide whether a Tweet's sentiment is positive, neutral, or negative.
-            Tweet: "{}"
-            Sentiment:
-                    "#,
-            s.replace("\"", "'")
-        ),
+        prompt,
         ..Default::default()
     };
     let mut r = create_completion("Michael", cr);
