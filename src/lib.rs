@@ -20,10 +20,15 @@ async fn handler(payload: EventPayload) {
 
     match payload {
         EventPayload::IssueCommentEvent(e) => {
-            if let Some(b) = e.comment.body {
-                let r = chat_completion("DarumaDocker", &b);
-                if let Err(e) = issues.create_comment(e.issue.number, r).await {
-                    write_error_log!(e.to_string());
+            if e.comment.user.r#type != "Bot" {
+                if let Some(b) = e.comment.body {
+                    if let Some(r) =
+                        chat_completion("DarumaDocker", &format!("issue#{}", e.issue.number), &b)
+                    {
+                        if let Err(e) = issues.create_comment(e.issue.number, r.choice).await {
+                            write_error_log!(e.to_string());
+                        }
+                    }
                 }
             }
         }
