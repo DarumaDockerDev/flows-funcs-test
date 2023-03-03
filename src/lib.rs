@@ -12,7 +12,7 @@ pub async fn run() {
     listen_to_event(
         "DarumaDocker",
         "github-func-test",
-        vec!["issue_comment", "issues"],
+        vec!["issue_comment"],
         handler,
     )
     .await;
