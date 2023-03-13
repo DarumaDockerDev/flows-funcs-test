@@ -22,7 +22,10 @@ async fn handler(payload: EventPayload) {
         EventPayload::IssueCommentEvent(e) => {
             if e.comment.user.r#type != "Bot" {
                 if let Some(b) = e.comment.body {
-                    let co = ChatOptions::default();
+                    let co = ChatOptions {
+                        restart: b.eq_ignore_ascii_case("/restart"),
+                        restarted_sentence: Some("let's restart a talk"),
+                    };
                     if let Some(r) = chat_completion(
                         "DarumaDocker",
                         &format!("issue#{}", e.issue.number),
