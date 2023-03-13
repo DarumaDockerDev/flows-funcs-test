@@ -1,6 +1,6 @@
 use flowsnet_platform_sdk::write_error_log;
 use github_flows::{get_octo, listen_to_event, octocrab::models::events::payload::EventPayload};
-use openai_flows::chat_completion;
+use openai_flows::{chat_completion, ChatOptions};
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
@@ -22,9 +22,13 @@ async fn handler(payload: EventPayload) {
         EventPayload::IssueCommentEvent(e) => {
             if e.comment.user.r#type != "Bot" {
                 if let Some(b) = e.comment.body {
-                    if let Some(r) =
-                        chat_completion("DarumaDocker", &format!("issue#{}", e.issue.number), &b)
-                    {
+                    let co = ChatOptions::default();
+                    if let Some(r) = chat_completion(
+                        "DarumaDocker",
+                        &format!("issue#{}", e.issue.number),
+                        &b,
+                        &co,
+                    ) {
                         if let Err(e) = issues.create_comment(e.issue.number, r.choice).await {
                             write_error_log!(e.to_string());
                         }
