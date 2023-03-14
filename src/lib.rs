@@ -43,3 +43,4 @@ async fn handler(payload: EventPayload) {
         _ => (),
     };
 }
+>
