@@ -5,6 +5,7 @@ use serde_json::Value;
 
 #[no_mangle]
 pub fn run() {
+    println!("test");
     request_received(|qry, _body| {
         let city = qry.get("city").unwrap_or(&Value::Null).as_str();
         let resp = match city {
