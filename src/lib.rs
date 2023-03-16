@@ -5,7 +5,6 @@ use serde_json::Value;
 
 #[no_mangle]
 pub fn run() {
-    println!("test");
     request_received(|qry, _body| {
         let city = qry.get("city").unwrap_or(&Value::Null).as_str();
         let resp = match city {
@@ -32,12 +31,18 @@ Wind Speed: {} km/h",
         match resp {
             Ok(r) => send_response(
                 200,
-                vec![(String::from("content-type"), String::from("text/html"))],
+                vec![(
+                    String::from("content-type"),
+                    String::from("text/html; charset=UTF-8"),
+                )],
                 r.as_bytes().to_vec(),
             ),
             Err(e) => send_response(
                 400,
-                vec![(String::from("content-type"), String::from("text/html"))],
+                vec![(
+                    String::from("content-type"),
+                    String::from("text/html; charset=UTF-8"),
+                )],
                 e.as_bytes().to_vec(),
             ),
         }
