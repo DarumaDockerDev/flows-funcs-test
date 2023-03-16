@@ -3,6 +3,7 @@ use lambda_flows::{request_received, send_response};
 use serde::Deserialize;
 use serde_json::Value;
 
+#[no_mangle]
 pub fn run() {
     request_received(|qry, _body| {
         let city = qry.get("city").unwrap_or(&Value::Null).as_str();
