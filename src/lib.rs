@@ -1,14 +1,15 @@
-use flowsnet_platform_sdk::write_error_log;
-use openai_flows::chat_completion;
-use slack_flows::{listen_to_channel, send_message_to_channel, SlackMessage};
+use openai_flows::{chat_completion, ChatOptions};
+use slack_flows::{listen_to_channel, send_message_to_channel};
 
 #[no_mangle]
 pub fn run() {
-    listen_to_channel("family-wangshi", "chat", handler);
-}
-
-fn handler(sm: SlackMessage) {
-    if let Some(r) = chat_completion("Michael", "random", &sm.text) {
-        send_message_to_channel("family-wangshi", "chat", r.choice);
-    }
+    listen_to_channel("family-wangshi", "chat", |sm| {
+        let co = ChatOptions {
+            restart: sm.text.eq_ignore_ascii_case("/restart"),
+            restarted_sentence: Some("let's change the subject"),
+        };
+        if let Some(r) = chat_completion("Michael", "any_conversation", &sm.text, &co) {
+            send_message_to_channel("family-wangshi", "chat", r.choice);
+        }
+    });
 }
