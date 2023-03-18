@@ -7,6 +7,7 @@ use openai_flows::{chat_completion, ChatOptions};
 pub async fn run() {
     listen_to_event(
         "DarumaDockerDev",
+        "DarumaDockerDev",
         "github-func-test",
         vec!["issue_comment"],
         handler,
