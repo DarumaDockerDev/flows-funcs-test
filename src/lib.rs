@@ -1,6 +1,6 @@
 use flowsnet_platform_sdk::write_error_log;
 use github_flows::{get_octo, listen_to_event, octocrab::models::events::payload::EventPayload};
-use openai_flows::{chat_completion, ChatOptions};
+use openai_flows::{chat_completion, ChatModel, ChatOptions};
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
@@ -24,6 +24,7 @@ async fn handler(payload: EventPayload) {
             if e.comment.user.r#type != "Bot" {
                 if let Some(b) = e.comment.body {
                     let co = ChatOptions {
+                        model: ChatModel::GPT35Turbo,
                         restart: b.eq_ignore_ascii_case("/restart"),
                         restarted_sentence: Some("let's restart a talk"),
                     };
