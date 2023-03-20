@@ -10,4 +10,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 openai-flows = "0.2.2"
-tg-flows = "=0.1.0"
+tg-flows = "0.1.0"
