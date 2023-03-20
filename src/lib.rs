@@ -13,30 +13,22 @@ pub fn run() {
             let text = msg.text().unwrap_or("");
             let chat_id = msg.chat.id;
 
-            let message = tele.send_message(chat_id, text);
+            let c = chat_completion(
+                &openai_key_name,
+                &chat_id.to_string(),
+                &text,
+                &ChatOptions::default(),
+            );
 
-            match message {
-                Ok(m) => {
-                    let c = chat_completion(
-                        &openai_key_name,
-                        &chat_id.to_string(),
-                        &text,
-                        &ChatOptions::default(),
-                    );
-
-                    if let Some(c) = c {
-                        if c.restarted {
-                            _ = tele.send_message(chat_id, "Let's start a new conversation!");
-                        }
-
-                        _ = tele.edit_message_text(chat_id, m.id, c.choice);
-                    } else {
-                        _ = tele.send_message(chat_id, "I have no choice");
-                    }
+            if let Some(c) = c {
+                if c.restarted {
+                    _ = tele.send_message(chat_id, "Let's start a new conversation!");
                 }
-                Err(e) => {
-                    println!("--- {:?}", e);
-                }
+
+                // _ = tele.edit_message_text(chat_id, m.id, c.choice);
+                _ = tele.send_message(chat_id, c.choice);
+            } else {
+                _ = tele.send_message(chat_id, "I have no choice");
             }
         }
     });
