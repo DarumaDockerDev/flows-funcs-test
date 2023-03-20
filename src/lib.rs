@@ -7,6 +7,7 @@ pub fn run() {
 
     let telegram_token = std::env::var("telegram_token").unwrap();
     let tele = Telegram::new(telegram_token.clone());
+    println!("test");
 
     listen_to_update(telegram_token, |update| {
         if let UpdateKind::Message(msg) = update.kind {
