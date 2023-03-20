@@ -17,6 +17,7 @@ pub fn run() {
 
             match message {
                 Ok(m) => {
+                    println!("--- {:?}", m);
                     let c = chat_completion(
                         &openai_key_name,
                         &chat_id.to_string(),
@@ -34,7 +35,9 @@ pub fn run() {
                         _ = tele.send_message(chat_id, "I have no choice");
                     }
                 }
-                Err(_) => (),
+                Err(e) => {
+                    println!("--- {:?}", e);
+                }
             }
         }
     });
