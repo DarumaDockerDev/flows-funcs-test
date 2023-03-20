@@ -9,12 +9,14 @@ pub fn run() {
     let tele = Telegram::new(telegram_token.clone());
 
     listen_to_update(telegram_token, |update| {
+        println!("---1");
         if let UpdateKind::Message(msg) = update.kind {
             let text = msg.text().unwrap_or("");
             let chat_id = msg.chat.id;
 
             let message = tele.send_message(chat_id, text);
 
+            println!("---2");
             match message {
                 Ok(m) => {
                     let c = chat_completion(
@@ -24,6 +26,7 @@ pub fn run() {
                         &ChatOptions::default(),
                     );
 
+                    println!("---3");
                     if let Some(c) = c {
                         if c.restarted {
                             _ = tele.send_message(chat_id, "Let's start a new conversation!");
