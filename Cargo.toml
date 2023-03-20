@@ -9,6 +9,5 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-github-flows = "0.1"
-slack-flows = "0.2"
-tokio_wasi = "1.25.1"
+openai-flows = "0.2.2"
+tg-flows = "=0.1.0"

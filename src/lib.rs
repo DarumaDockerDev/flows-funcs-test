@@ -1,31 +1,41 @@
-use github_flows::{
-    get_octo, listen_to_event,
-    octocrab::models::{events::payload::EventPayload, reactions::ReactionContent},
-};
+use openai_flows::{chat_completion, ChatOptions};
+use tg_flows::{listen_to_update, Telegram, UpdateKind};
 
 #[no_mangle]
-#[tokio::main(flavor = "current_thread")]
-pub async fn run() {
-    listen_to_event(
-        "DarumaDockerDev",
-        "github-func-test",
-        vec!["issue_comment"],
-        handler,
-    )
-    .await;
-}
+pub fn run() {
+    let openai_key_name = "Michael";
 
-async fn handler(payload: EventPayload) {
-    if let EventPayload::IssueCommentEvent(e) = payload {
-        let issue_number = e.comment.id.0;
+    let telegram_token = std::env::var("telegram_token").unwrap();
+    let tele = Telegram::new(telegram_token.clone());
 
-        // installed app login
-        let octo = get_octo(Some(String::from("DarumaDockerDev")));
+    listen_to_update(telegram_token, |update| {
+        if let UpdateKind::Message(msg) = update.kind {
+            let text = msg.text().unwrap_or("");
+            let chat_id = msg.chat.id;
 
-        let _reaction = octo
-            .issues("DarumaDockerDev", "github-func-test")
-            .create_reaction(issue_number, ReactionContent::Rocket)
-            .await
-            .unwrap();
-    };
+            let message = tele.send_message(chat_id, text);
+
+            match message {
+                Ok(m) => {
+                    let c = chat_completion(
+                        &openai_key_name,
+                        &chat_id.to_string(),
+                        &text,
+                        &ChatOptions::default(),
+                    );
+
+                    if let Some(c) = c {
+                        if c.restarted {
+                            _ = tele.send_message(chat_id, "Let's start a new conversation!");
+                        }
+
+                        // _ = tele.edit_message_text(chat_id, m.id, c.choice);
+                    } else {
+                        _ = tele.send_message(chat_id, "I have no choice");
+                    }
+                }
+                Err(_) => (),
+            }
+        }
+    });
 }
