@@ -35,9 +35,9 @@ async fn handler(payload: EventPayload) {
                         &co,
                     ) {
                         // write_error_log!(r.restarted);
-                        if let Err(e) = issues.create_comment(e.issue.number, r.choice).await {
-                            // write_error_log!(e.to_string());
-                        }
+                        //if let Err(e) = issues.create_comment(e.issue.number, r.choice).await {
+                        // write_error_log!(e.to_string());
+                        //}
                     }
                 }
             }
