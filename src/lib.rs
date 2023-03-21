@@ -1,4 +1,4 @@
-use flowsnet_platform_sdk::write_error_log;
+// use flowsnet_platform_sdk::write_error_log;
 use github_flows::{get_octo, listen_to_event, octocrab::models::events::payload::EventPayload};
 use openai_flows::{chat_completion, ChatModel, ChatOptions};
 
@@ -16,7 +16,6 @@ pub async fn run() {
 }
 
 async fn handler(payload: EventPayload) {
-    println!("Prevent segment fault");
     let octo = get_octo(Some(String::from("DarumaDockerDev")));
     let issues = octo.issues("DarumaDockerDev", "github-func-test");
 
@@ -37,7 +36,7 @@ async fn handler(payload: EventPayload) {
                     ) {
                         // write_error_log!(r.restarted);
                         if let Err(e) = issues.create_comment(e.issue.number, r.choice).await {
-                            write_error_log!(e.to_string());
+                            // write_error_log!(e.to_string());
                         }
                     }
                 }
