@@ -21,7 +21,8 @@ async fn handler(payload: EventPayload) {
 
     match payload {
         EventPayload::IssueCommentEvent(e) => {
-            if e.comment.user.r#type != "Bot" {
+            let last_comment_id = store_flows::get("last_created_comment").unwrap_or_default();
+            if e.comment.id.into_inner() != last_comment_id.as_u64().unwrap_or_default() {
                 if let Some(b) = e.comment.body {
                     let co = ChatOptions {
                         model: ChatModel::GPT35Turbo,
@@ -35,8 +36,16 @@ async fn handler(payload: EventPayload) {
                         &co,
                     ) {
                         write_error_log!(r.restarted);
-                        if let Err(e) = issues.create_comment(e.issue.number, r.choice).await {
-                            write_error_log!(e.to_string());
+                        match issues.create_comment(e.issue.number, r.choice).await {
+                            Ok(comment) => {
+                                store_flows::set(
+                                    "last_created_comment",
+                                    serde_json::to_value(comment.id.into_inner()).unwrap(),
+                                );
+                            }
+                            Err(e) => {
+                                write_error_log!(e.to_string());
+                            }
                         }
                     }
                 }
