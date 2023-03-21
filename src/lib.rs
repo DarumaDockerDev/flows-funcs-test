@@ -16,6 +16,7 @@ pub async fn run() {
 }
 
 async fn handler(payload: EventPayload) {
+    println!("Prevent segment fault");
     let octo = get_octo(Some(String::from("DarumaDockerDev")));
     let issues = octo.issues("DarumaDockerDev", "github-func-test");
 
