@@ -1,4 +1,4 @@
-// use flowsnet_platform_sdk::write_error_log;
+use flowsnet_platform_sdk::write_error_log;
 use github_flows::{get_octo, listen_to_event, octocrab::models::events::payload::EventPayload};
 use openai_flows::{chat_completion, ChatModel, ChatOptions};
 
@@ -34,10 +34,10 @@ async fn handler(payload: EventPayload) {
                         &b,
                         &co,
                     ) {
-                        // write_error_log!(r.restarted);
-                        //if let Err(e) = issues.create_comment(e.issue.number, r.choice).await {
-                        // write_error_log!(e.to_string());
-                        //}
+                        write_error_log!(r.restarted);
+                        if let Err(e) = issues.create_comment(e.issue.number, r.choice).await {
+                            write_error_log!(e.to_string());
+                        }
                     }
                 }
             }
