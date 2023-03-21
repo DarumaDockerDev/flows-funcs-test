@@ -20,6 +20,7 @@ pub fn run() {
                 &ChatOptions::default(),
             );
 
+            /*
             if let Some(c) = c {
                 if c.restarted {
                     _ = tele.send_message(chat_id, "Let's start a new conversation!");
@@ -30,6 +31,7 @@ pub fn run() {
             } else {
                 _ = tele.send_message(chat_id, "I have no choice");
             }
+            */
         }
     });
 }
