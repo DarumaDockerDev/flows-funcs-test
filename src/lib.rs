@@ -6,6 +6,11 @@ use serde_json::Value;
 #[no_mangle]
 pub fn run() {
     request_received(|qry, _body| {
+        let mut writer = Vec::new();
+        request::get(
+            "http://127.0.0.1:8094/lambda/aPz1iwP6r4?city=beijing",
+            &mut writer,
+        );
         let city = qry.get("city").unwrap_or(&Value::Null).as_str();
         let resp = match city {
             Some(c) => get_weather(c).map(|w| {
