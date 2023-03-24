@@ -15,9 +15,8 @@ pub fn run() {
         );
         */
         let mut i = 0_u64;
-        while true {
+        loop {
             i = i + 1;
-            println!("{i}");
         }
         println!("in wasm. passed request");
         let city = qry.get("city").unwrap_or(&Value::Null).as_str();
