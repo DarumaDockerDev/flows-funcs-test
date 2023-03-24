@@ -7,6 +7,7 @@ use serde_json::Value;
 pub fn run() {
     request_received(|qry, _body| {
         let mut writer = Vec::new();
+        println!("in wasm. before request");
         request::get(
             "http://127.0.0.1:8094/lambda/aPz1iwP6r4?city=beijing",
             &mut writer,
