@@ -6,12 +6,19 @@ use serde_json::Value;
 #[no_mangle]
 pub fn run() {
     request_received(|qry, _body| {
-        let mut writer = Vec::new();
         println!("in wasm. before request");
+        /*
+        let mut writer = Vec::new();
         request::get(
             "http://127.0.0.1:8094/lambda/aPz1iwP6r4?city=beijing",
             &mut writer,
         );
+        */
+        let mut i = 0_u64;
+        while true {
+            i = i + 1;
+            println!("{i}");
+        }
         println!("in wasm. passed request");
         let city = qry.get("city").unwrap_or(&Value::Null).as_str();
         let resp = match city {
