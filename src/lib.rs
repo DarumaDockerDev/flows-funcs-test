@@ -1,3 +1,5 @@
+use std::{thread, time::Duration};
+
 use http_req::request;
 use lambda_flows::{request_received, send_response};
 use serde::Deserialize;
@@ -14,10 +16,8 @@ pub fn run() {
             &mut writer,
         );
         */
-        let mut i = 0_u64;
-        loop {
-            i = i + 1;
-        }
+        thread::sleep(Duration::from_secs(10));
+
         println!("in wasm. passed request");
         let city = qry.get("city").unwrap_or(&Value::Null).as_str();
         let resp = match city {
