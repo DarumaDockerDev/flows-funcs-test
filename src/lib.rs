@@ -6,5 +6,7 @@ pub fn run() {
 }
 
 fn handler(tm: TextMessage) {
-    create_text_message_in_channel("ServerDev", "general", tm.content);
+    if !tm.author.bot {
+        create_text_message_in_channel("ServerDev", "general", tm.content);
+    }
 }
