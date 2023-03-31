@@ -1,4 +1,4 @@
-use openai_flows::{chat_completion, ChatOptions};
+use openai_flows::{chat_completion, ChatModel, ChatOptions};
 use tg_flows::{listen_to_update, Telegram, UpdateKind};
 
 #[no_mangle]
@@ -17,20 +17,21 @@ pub fn run() {
                 &openai_key_name,
                 &chat_id.to_string(),
                 &text,
-                &ChatOptions::default(),
+                &ChatOptions {
+                    model: ChatModel::GPT35Turbo,
+                    restart: true,
+                    restarted_sentence: None,
+                },
             );
 
             if let Some(c) = c {
                 if c.restarted {
-                    println!("--1");
                     _ = tele.send_message(chat_id, "Let's start a new conversation!");
                 }
 
                 // _ = tele.edit_message_text(chat_id, m.id, c.choice);
-                println!("--2");
                 _ = tele.send_message(chat_id, c.choice);
             } else {
-                println!("--3");
                 _ = tele.send_message(chat_id, "I have no choice");
             }
         }
