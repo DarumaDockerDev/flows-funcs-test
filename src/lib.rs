@@ -18,8 +18,8 @@ pub fn run() {
                 &chat_id.to_string(),
                 &text,
                 &ChatOptions {
-                    model: ChatModel::GPT35Turbo,
-                    restart: true,
+                    model: ChatModel::GPT4,
+                    restart: false,
                     restarted_sentence: None,
                 },
             );
