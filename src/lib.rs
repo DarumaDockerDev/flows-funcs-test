@@ -1,4 +1,6 @@
 use openai_flows::{chat_completion, ChatModel, ChatOptions};
+use serde_json::json;
+use store_flows::{get, set};
 use tg_flows::{listen_to_update, Telegram, UpdateKind};
 
 #[no_mangle]
@@ -7,6 +9,8 @@ pub fn run() {
 
     let telegram_token = std::env::var("telegram_token").unwrap();
     let tele = Telegram::new(telegram_token.clone());
+
+    set("aaa", json!({"a": 1}), None);
 
     listen_to_update(telegram_token, |update| {
         if let UpdateKind::Message(msg) = update.kind {
