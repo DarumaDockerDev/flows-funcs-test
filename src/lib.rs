@@ -20,7 +20,7 @@ pub fn run() {
                 &ChatOptions {
                     model: ChatModel::GPT4,
                     restart: false,
-                    restarted_sentence: None,
+                    system_prompt: Some("You are awesome!"),
                 },
             );
 
