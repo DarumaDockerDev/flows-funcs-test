@@ -3,7 +3,7 @@ use tg_flows::{listen_to_update, Telegram, UpdateKind};
 
 #[no_mangle]
 pub fn run() {
-    let openai_key_name = "Michael";
+    let openai_key_name = "global.free.trial";
 
     let telegram_token = std::env::var("telegram_token").unwrap();
     let tele = Telegram::new(telegram_token.clone());
