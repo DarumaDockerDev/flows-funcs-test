@@ -18,7 +18,7 @@ pub fn run() {
                 &chat_id.to_string(),
                 &text,
                 &ChatOptions {
-                    model: ChatModel::GPT35Turbo,
+                    model: ChatModel::GPT4,
                     restart: false,
                     system_prompt: Some("You are awesome!"),
                 },
