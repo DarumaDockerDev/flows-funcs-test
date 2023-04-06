@@ -21,6 +21,7 @@ pub fn run() {
                     model: ChatModel::GPT35Turbo,
                     restart: false,
                     system_prompt: Some("You are awesome!"),
+                    retry_times: 2,
                 },
             );
 
