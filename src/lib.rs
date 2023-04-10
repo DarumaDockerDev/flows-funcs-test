@@ -10,7 +10,7 @@ pub fn run() {
                 200,
                 vec![(
                     String::from("content-type"),
-                    String::from("text/html; charset=UTF-8"),
+                    String::from("text/plain; charset=UTF-8"),
                 )],
                 r.as_bytes().to_vec(),
             ),
@@ -18,7 +18,7 @@ pub fn run() {
                 500,
                 vec![(
                     String::from("content-type"),
-                    String::from("text/html; charset=UTF-8"),
+                    String::from("text/plain; charset=UTF-8"),
                 )],
                 e.as_bytes().to_vec(),
             ),
