@@ -1,5 +1,5 @@
 use discord_flows::{create_text_message_in_dm, listen_to_dm, TextMessage};
-use openai_flows::{create_image, ImageRequest, ImageSize};
+use openai_flows::{create_image_anonym, ImageRequest, ImageSize};
 
 #[no_mangle]
 pub fn run() {
@@ -14,7 +14,7 @@ fn handler(tm: TextMessage) {
             size: ImageSize::S256,
             retry_times: 2,
         };
-        let r = create_image("Michael", ir);
+        let r = create_image_anonym(ir);
 
         match r.len() {
             0 => {
