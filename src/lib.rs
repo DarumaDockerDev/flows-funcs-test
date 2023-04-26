@@ -6,10 +6,7 @@ use lambda_flows::{request_received, send_response};
 pub fn run() {
     logger::init();
     request_received(|_qry, body| {
-        log::debug!("debug \ndebug");
-        log::info!("info \ninfo");
-        log::warn!("warn \nwarn");
-        log::error!("error \nerror");
+        log::debug!("{}", String::from_utf8(body.clone()).unwrap());
         // let text = text_detection(String::from_utf8(body).unwrap());
         send_response(
             200,
