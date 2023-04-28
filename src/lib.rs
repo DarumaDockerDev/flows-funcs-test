@@ -5,11 +5,11 @@ use lambda_flows::{request_received, send_response};
 #[no_mangle]
 pub fn run() {
     logger::init();
-    log::debug!("run debug");
+    log::debug!("debug debug");
     request_received(|_qry, body| {
-        log::error!("{}", "6-1");
-        log::warn!("{}", "6-2");
-        log::info!("{}", "6-3");
+        log::error!("some error message");
+        log::warn!("some warn message");
+        log::info!("some info message");
         // let text = text_detection(String::from_utf8(body).unwrap());
         send_response(
             200,
