@@ -16,5 +16,5 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 flowsnet-platform-sdk = "0.1"
 log = "0.4"
-openai-flows = "0.6"
+openai-flows = "0.7"
 tokio_wasi = { version = "1.25.1", features = ["macros", "rt"] }

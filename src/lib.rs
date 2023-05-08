@@ -1,6 +1,9 @@
 use flowsnet_platform_sdk::logger;
 use lambda_flows::{request_received, send_response};
-use openai_flows::{chat_completion, create_embeddings, ChatModel, ChatOptions, FlowsAccount};
+use openai_flows::{
+    chat::{ChatModel, ChatOptions},
+    OpenAIFlows,
+};
 use serde_json::Value;
 use std::collections::HashMap;
 
@@ -16,15 +19,16 @@ async fn handler(_qry: HashMap<String, Value>, body: Vec<u8>) {
         model: ChatModel::GPT35Turbo,
         restart: false,
         system_prompt: None,
-        retry_times: 2,
     };
-    let r = match chat_completion(
-        FlowsAccount::Default,
-        "any_conversation_id",
-        String::from_utf8_lossy(&body).into_owned().as_str(),
-        &co,
-    )
-    .await
+    let of = OpenAIFlows::new();
+
+    let r = match of
+        .chat_completion(
+            "any_conversation_id",
+            String::from_utf8_lossy(&body).into_owned().as_str(),
+            &co,
+        )
+        .await
     {
         Ok(c) => c.choice,
         Err(e) => e,
