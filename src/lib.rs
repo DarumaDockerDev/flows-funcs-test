@@ -10,7 +10,7 @@ use github_flows::{
 pub async fn run() {
     logger::init();
     listen_to_event(
-        &GithubLogin::Default,
+        &GithubLogin::Provided(String::from("DarumaDockerDev")),
         "DarumaDockerDev",
         "github-func-test",
         vec!["issue_comment"],
@@ -25,7 +25,7 @@ async fn handler(payload: EventPayload) {
         let issue_number = e.comment.id.0;
 
         // installed app login
-        let octo = get_octo(&GithubLogin::Default);
+        let octo = get_octo(&GithubLogin::Provided(String::from("DarumaDockerDev")));
 
         octo.issues("DarumaDockerDev", "github-func-test")
             .create_comment_reaction(issue_number, ReactionContent::Rocket)
