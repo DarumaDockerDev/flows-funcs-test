@@ -11,3 +11,5 @@ crate-type = ["cdylib"]
 [dependencies]
 github-flows = "0.5"
 tokio_wasi = "1.25.1"
+flowsnet-platform-sdk = "0.1"
+log = "0.4.17"
