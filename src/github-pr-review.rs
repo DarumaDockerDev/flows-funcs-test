@@ -30,20 +30,31 @@ pub async fn run() -> anyhow::Result<()> {
     logger::init();
     log::debug!("Running github-pr-review/main");
 
+    let login = env::var("github_login").unwrap_or("DarumaDocker".to_string());
     let owner = env::var("github_owner").unwrap_or("DarumaDocker".to_string());
     let repo = env::var("github_repo").unwrap_or("Test".to_string());
     let trigger_phrase = env::var("trigger_phrase").unwrap_or("flows review".to_string());
 
     let events = vec!["pull_request", "issue_comment"];
-    listen_to_event(&GithubLogin::Default, &owner, &repo, events, |payload| {
-        handler(&owner, &repo, &trigger_phrase, payload)
-    })
+    listen_to_event(
+        &GithubLogin::Provided(login.clone()),
+        &owner,
+        &repo,
+        events,
+        |payload| handler(login, &owner, &repo, &trigger_phrase, payload),
+    )
     .await;
 
     Ok(())
 }
 
-async fn handler(owner: &str, repo: &str, trigger_phrase: &str, payload: EventPayload) {
+async fn handler(
+    login: String,
+    owner: &str,
+    repo: &str,
+    trigger_phrase: &str,
+    payload: EventPayload,
+) {
     // log::debug!("Received payload: {:?}", payload);
     let mut new_commit: bool = false;
     let (title, pull_number, _contributor) = match payload {
@@ -97,7 +108,7 @@ async fn handler(owner: &str, repo: &str, trigger_phrase: &str, payload: EventPa
     let mut openai = OpenAIFlows::new();
     openai.set_retry_times(3);
 
-    let octo = get_octo(&GithubLogin::Default);
+    let octo = get_octo(&GithubLogin::Provided(login));
     let issues = octo.issues(owner, repo);
     let mut comment_id: CommentId = 0u64.into();
     if new_commit {
