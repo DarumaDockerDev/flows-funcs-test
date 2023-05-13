@@ -1,21 +1,32 @@
-use discord_flows::{create_text_message_in_dm, listen_to_dm, TextMessage};
-
-extern "C" {
-    fn set_log(p: *const u8, len: i32);
-}
+use discord_flows::{get_client, listen_to_event, model::Message};
+use flowsnet_platform_sdk::logger;
 
 #[no_mangle]
-pub fn run() {
-    listen_to_dm("DarumaDockerDev", handler);
+#[tokio::main(flavor = "current_thread")]
+pub async fn run() {
+    logger::init();
+    let token = std::env::var("DISCORD_TOKEN").unwrap();
+
+    listen_to_event(token.clone(), move |msg| handle(msg, token)).await;
 }
 
-fn handler(tm: TextMessage) {
-    let log = b"abc".to_vec();
-    unsafe {
-        set_log(log.as_ptr(), log.len() as i32);
+async fn handle(msg: Message, token: String) {
+    let client = get_client(token);
+    let channel_id = msg.channel_id;
+    let content = msg.content;
+
+    log::debug!("-------------");
+    if msg.author.bot {
+        log::debug!("message from bot");
+        return;
     }
 
-    if !tm.author.bot {
-        create_text_message_in_dm("DarumaDockerDev", tm.content, Some(tm.id))
-    }
+    _ = client
+        .send_message(
+            channel_id.into(),
+            &serde_json::json!({
+                "content": content,
+            }),
+        )
+        .await;
 }
