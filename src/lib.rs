@@ -1,4 +1,4 @@
-use std::{thread, time::Duration};
+use std::{collections::HashMap, thread, time::Duration};
 
 use http_req::request;
 use lambda_flows::{request_received, send_response};
@@ -6,60 +6,63 @@ use serde::Deserialize;
 use serde_json::Value;
 
 #[no_mangle]
-pub fn run() {
-    request_received(|qry, _body| {
-        println!("in wasm. before request");
-        /*
-        let mut writer = Vec::new();
-        request::get(
-            "http://127.0.0.1:8094/lambda/aPz1iwP6r4?city=beijing",
-            &mut writer,
-        );
-        */
-        thread::sleep(Duration::from_secs(10));
+#[tokio::main(flavor = "current_thread")]
+pub async fn run() {
+    request_received(handler).await;
+}
 
-        println!("in wasm. passed request");
-        let city = qry.get("city").unwrap_or(&Value::Null).as_str();
-        let resp = match city {
-            Some(c) => get_weather(c).map(|w| {
-                format!(
-                    "Today: {},
+async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
+    println!("in wasm. before request");
+    /*
+    let mut writer = Vec::new();
+    request::get(
+        "http://127.0.0.1:8094/lambda/aPz1iwP6r4?city=beijing",
+        &mut writer,
+    );
+    */
+    thread::sleep(Duration::from_secs(10));
+
+    println!("in wasm. passed request");
+    let city = qry.get("city").unwrap_or(&Value::Null).as_str();
+    let resp = match city {
+        Some(c) => get_weather(c).map(|w| {
+            format!(
+                "Today: {},
 Low temperature: {} °C,
 High temperature: {} °C,
 Wind Speed: {} km/h",
-                    w.weather
-                        .first()
-                        .unwrap_or(&Weather {
-                            main: "Unknown".to_string()
-                        })
-                        .main,
-                    w.main.temp_min as i32,
-                    w.main.temp_max as i32,
-                    w.wind.speed as i32
-                )
-            }),
-            None => Err(String::from("No city in query")),
-        };
+                w.weather
+                    .first()
+                    .unwrap_or(&Weather {
+                        main: "Unknown".to_string()
+                    })
+                    .main,
+                w.main.temp_min as i32,
+                w.main.temp_max as i32,
+                w.wind.speed as i32
+            )
+        }),
+        None => Err(String::from("No city in query")),
+    };
 
-        match resp {
-            Ok(r) => send_response(
-                200,
-                vec![(
-                    String::from("content-type"),
-                    String::from("text/html; charset=UTF-8"),
-                )],
-                r.as_bytes().to_vec(),
-            ),
-            Err(e) => send_response(
-                400,
-                vec![(
-                    String::from("content-type"),
-                    String::from("text/html; charset=UTF-8"),
-                )],
-                e.as_bytes().to_vec(),
-            ),
-        }
-    });
+    match resp {
+        Ok(r) => send_response(
+            200,
+            vec![(
+                String::from("content-type"),
+                String::from("text/html; charset=UTF-8"),
+            )],
+            r.as_bytes().to_vec(),
+        ),
+        Err(e) => send_response(
+            400,
+            vec![(
+                String::from("content-type"),
+                String::from("text/html; charset=UTF-8"),
+            )],
+            e.as_bytes().to_vec(),
+        ),
+    }
 }
 
 #[derive(Deserialize)]
