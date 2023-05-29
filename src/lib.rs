@@ -12,7 +12,10 @@ pub async fn run() {
 }
 
 async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
-    println!("in wasm. before request");
+    println!(
+        "in wasm. before request {}",
+        qry.get("x").unwrap_or(&Value::String(String::from("-")))
+    );
     /*
     let mut writer = Vec::new();
     request::get(
@@ -22,7 +25,11 @@ async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
     */
     thread::sleep(Duration::from_secs(10));
 
-    println!("in wasm. passed request");
+    println!(
+        "in wasm. passed request {}",
+        qry.get("x").unwrap_or(&Value::String(String::from("-")))
+    );
+
     let city = qry.get("city").unwrap_or(&Value::Null).as_str();
     let resp = match city {
         Some(c) => get_weather(c).map(|w| {
