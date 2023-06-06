@@ -1,4 +1,4 @@
-use discord_flows::{model::Message, Bot, DefaultBot};
+use discord_flows::{model::Message, Bot, ProvidedBot};
 use flowsnet_platform_sdk::logger;
 
 const CHANNEL_ID: u64 = 1090160755522928640;
@@ -7,15 +7,14 @@ const CHANNEL_ID: u64 = 1090160755522928640;
 #[tokio::main(flavor = "current_thread")]
 pub async fn run() {
     logger::init();
-    // let token = std::env::var("DISCORD_TOKEN").unwrap();
+    let token = std::env::var("DISCORD_TOKEN").unwrap();
 
-    let bot = DefaultBot {};
-    bot.listen_to_channel(CHANNEL_ID, move |msg| handle(msg))
+    let bot = ProvidedBot::new(token);
+    bot.listen_to_channel(CHANNEL_ID, |msg| handle(&bot, msg))
         .await;
 }
 
-async fn handle(msg: Message) {
-    let bot = DefaultBot {};
+async fn handle<B: Bot>(bot: &B, msg: Message) {
     let client = bot.get_client();
     let channel_id = msg.channel_id;
     let content = msg.content;
