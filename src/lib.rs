@@ -10,8 +10,7 @@ pub async fn run() {
     let token = std::env::var("DISCORD_TOKEN").unwrap();
 
     let bot = ProvidedBot::new(token);
-    bot.listen_to_channel(CHANNEL_ID, |msg| handle(&bot, msg))
-        .await;
+    bot.listen(|msg| handle(&bot, msg)).await;
 }
 
 async fn handle<B: Bot>(bot: &B, msg: Message) {
