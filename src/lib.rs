@@ -1,7 +1,7 @@
 use discord_flows::{get_client, listen_to_event, model::Message, Bot, ChannelId};
 use flowsnet_platform_sdk::logger;
 
-const CHANNEL_ID: u64 = 995948764542013493;
+const CHANNEL_ID: u64 = 1090160755522928640;
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
