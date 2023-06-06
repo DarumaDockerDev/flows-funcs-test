@@ -1,4 +1,4 @@
-use discord_flows::{get_client, listen_to_event, model::Message, Bot, ChannelId};
+use discord_flows::{model::Message, Bot, DefaultBot};
 use flowsnet_platform_sdk::logger;
 
 const CHANNEL_ID: u64 = 1090160755522928640;
@@ -9,14 +9,14 @@ pub async fn run() {
     logger::init();
     // let token = std::env::var("DISCORD_TOKEN").unwrap();
 
-    listen_to_event(Bot::default_bot(ChannelId(CHANNEL_ID)), move |msg| {
-        handle(msg)
-    })
-    .await;
+    let bot = DefaultBot {};
+    bot.listen_to_channel(CHANNEL_ID, move |msg| handle(msg))
+        .await;
 }
 
 async fn handle(msg: Message) {
-    let client = get_client(Bot::default_bot(ChannelId(CHANNEL_ID)));
+    let bot = DefaultBot {};
+    let client = bot.get_client();
     let channel_id = msg.channel_id;
     let content = msg.content;
 
