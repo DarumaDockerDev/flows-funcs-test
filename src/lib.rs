@@ -1,7 +1,7 @@
 use flowsnet_platform_sdk::logger;
 use lambda_flows::{request_received, send_response};
 use openai_flows::{embeddings::EmbeddingsInput, OpenAIFlows};
-use serde_json::{json, Map, Value};
+use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::str;
 use vector_store_flows::*;
@@ -66,12 +66,12 @@ async fn handler(qry: HashMap<String, Value>, body: Vec<u8>) {
                 Ok(r) => {
                     // log::debug!("Received embedding {:#?}", r);
                     for v in r.iter() {
-                        let mut payload_map = Map::new();
-                        payload_map.insert("text".to_string(), json!(current_section));
                         let p = Point {
                             id: PointId::Num(id),
                             vector: v.iter().map(|n| *n as f32).collect(),
-                            payload: Some(payload_map),
+                            payload: json!({ "text": current_section })
+                                .as_object()
+                                .map(|m| m.to_owned()),
                         };
                         points.push(p);
                         log::debug!("Created vector {} with length {}", id, v.len());
