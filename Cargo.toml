@@ -1,5 +1,5 @@
 [package]
-name = "web-scraper-lambda"
+name = "vector-embeddings"
 version = "0.1.0"
 edition = "2021"
 

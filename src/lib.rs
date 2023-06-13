@@ -64,7 +64,7 @@ async fn handler(qry: HashMap<String, Value>, body: Vec<u8>) {
             let input = EmbeddingsInput::String(current_section.clone());
             match openai.create_embeddings(input).await {
                 Ok(r) => {
-                    log::debug!("Received embedding {:#?}", r);
+                    // log::debug!("Received embedding {:#?}", r);
                     for v in r.iter() {
                         let p = Point {
                             id: PointId::Num(id),
