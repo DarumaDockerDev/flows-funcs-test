@@ -46,41 +46,51 @@ async fn handler(_qry: HashMap<String, Value>, _body: Vec<u8>) {
             Point {
                 id: PointId::Num(1),
                 vector: vec![0.05, 0.61, 0.76, 0.74],
-                payload: Some(json!({
+                payload: json!({
                     "city": "Berlin",
                     "country": "Germany",
                     "count": 1000000,
                     "square": 12.5,
                     "coords": {"lat": 1.0, "lon": 2.0},
-                })),
+                })
+                .as_object()
+                .map(|m| m.to_owned()),
             },
             Point {
                 id: PointId::Num(2),
                 vector: vec![0.19, 0.81, 0.75, 0.11],
-                payload: Some(json!({
+                payload: json!({
                     "city": ["Berlin", "London"],
-                })),
+                })
+                .as_object()
+                .map(|m| m.to_owned()),
             },
             Point {
                 id: PointId::Num(3),
                 vector: vec![0.36, 0.55, 0.47, 0.94],
-                payload: Some(json!({
+                payload: json!({
                     "city": ["Berlin", "Moscow"],
-                })),
+                })
+                .as_object()
+                .map(|m| m.to_owned()),
             },
             Point {
                 id: PointId::Num(4),
                 vector: vec![0.18, 0.01, 0.85, 0.8],
-                payload: Some(json!({
+                payload: json!({
                     "city": ["London", "Moscow"],
-                })),
+                })
+                .as_object()
+                .map(|m| m.to_owned()),
             },
             Point {
                 id: PointId::Uuid(String::from("98a9a4b1-4ef2-46fb-8315-a97d874fe1d7")),
                 vector: vec![0.24, 0.18, 0.22, 0.44],
-                payload: Some(json!({
+                payload: json!({
                     "count": [0],
-                })),
+                })
+                .as_object()
+                .map(|m| m.to_owned()),
             },
             Point {
                 id: PointId::Uuid(String::from("f0e09527-b096-42a8-94e9-ea94d342b925")),
