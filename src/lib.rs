@@ -69,7 +69,7 @@ async fn handler(qry: HashMap<String, Value>, body: Vec<u8>) {
                         let p = Point {
                             id: PointId::Num(id),
                             vector: v.iter().map(|n| *n as f32).collect(),
-                            payload: Some(json!(current_section)),
+                            payload: Some(json!({ "text": current_section })),
                         };
                         points.push(p);
                         log::debug!("Created vector {} with length {}", id, v.len());
