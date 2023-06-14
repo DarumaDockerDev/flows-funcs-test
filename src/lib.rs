@@ -10,5 +10,5 @@ pub fn run() {
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
 async fn handler() {
-    send_message_to_channel("family-wangshi", "chat", "---".to_string());
+    send_message_to_channel("family-wangshi", "chat", "--".to_string());
 }
