@@ -4,8 +4,6 @@ use tg_flows::{listen_to_update, Telegram, UpdateKind};
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
 pub async fn run() {
-    let openai_key_name = "Michael";
-
     let telegram_token = std::env::var("telegram_token").unwrap();
     let tele = Telegram::new(telegram_token.clone());
 
