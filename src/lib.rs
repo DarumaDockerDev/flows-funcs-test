@@ -7,7 +7,7 @@ pub async fn run() {
     let telegram_token = std::env::var("telegram_token").unwrap();
     let tele = Telegram::new(telegram_token.clone());
 
-    listen_to_update(telegram_token, |update| handler(update, &tele));
+    listen_to_update(telegram_token, |update| handler(update, &tele)).await;
 }
 
 async fn handler(update: tg_flows::Update, tele: &Telegram) {
