@@ -13,3 +13,6 @@ openai-flows = "0.7"
 tg-flows = "0.2.0"
 serde_json = "1.0.95"
 tokio_wasi = { version = "1.25.1", features = ["macros", "rt"] }
+flowsnet-platform-sdk = "0.1"
+log = "0.4"
+

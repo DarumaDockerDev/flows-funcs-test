@@ -1,3 +1,4 @@
+use flowsnet_platform_sdk::logger;
 use openai_flows::{chat, OpenAIFlows};
 use tg_flows::{listen_to_update, Telegram, UpdateKind};
 
@@ -6,6 +7,8 @@ use tg_flows::{listen_to_update, Telegram, UpdateKind};
 pub async fn run() {
     let telegram_token = std::env::var("telegram_token").unwrap();
     let tele = Telegram::new(telegram_token.clone());
+
+    logger::init();
 
     listen_to_update(telegram_token, |update| handler(update, &tele)).await;
 }
@@ -17,6 +20,8 @@ async fn handler(update: tg_flows::Update, tele: &Telegram) {
 
         let of = OpenAIFlows::new();
         let co = chat::ChatOptions::default();
+
+        log::debug!("Received msg {text}");
 
         let c = of.chat_completion(&chat_id.to_string(), &text, &co).await;
 
