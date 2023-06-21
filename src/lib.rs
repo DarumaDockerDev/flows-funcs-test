@@ -1,3 +1,4 @@
+use claude_flows::{chat, ClaudeFlows};
 use discord_flows::{model::Message, Bot, ProvidedBot};
 use flowsnet_platform_sdk::logger;
 
@@ -24,12 +25,32 @@ async fn handle<B: Bot>(bot: &B, msg: Message) {
         return;
     }
 
-    _ = client
-        .send_message(
-            channel_id.into(),
-            &serde_json::json!({
-                "content": content,
-            }),
-        )
-        .await;
+    let cf = ClaudeFlows::new();
+    let co = chat::ChatOptions::default();
+
+    match cf
+        .chat_completion(channel_id.as_u64().to_string().as_str(), &content, &co)
+        .await
+    {
+        Ok(c) => {
+            _ = client
+                .send_message(
+                    channel_id.into(),
+                    &serde_json::json!({
+                        "content": c,
+                    }),
+                )
+                .await;
+        }
+        Err(e) => {
+            _ = client
+                .send_message(
+                    channel_id.into(),
+                    &serde_json::json!({
+                        "content": e,
+                    }),
+                )
+                .await;
+        }
+    }
 }
