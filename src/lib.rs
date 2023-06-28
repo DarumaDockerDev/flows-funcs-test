@@ -21,7 +21,7 @@ async fn handler(update: tg_flows::Update, tele: &Telegram) {
         let of = OpenAIFlows::new();
         let co = chat::ChatOptions::default();
 
-        log::debug!("Received msg {text}");
+        log::debug!("Received msg {text} @{chat_id}");
 
         let c = of.chat_completion(&chat_id.to_string(), &text, &co).await;
 
