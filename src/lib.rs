@@ -19,7 +19,10 @@ async fn handler(update: tg_flows::Update, tele: &Telegram) {
         let chat_id = msg.chat.id;
 
         let of = OpenAIFlows::new();
-        let co = chat::ChatOptions::default();
+        let co = chat::ChatOptions {
+            max_tokens: Some(50),
+            ..chat::ChatOptions::default()
+        };
 
         log::debug!("Received msg {text} @{chat_id}");
 
