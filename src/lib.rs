@@ -19,10 +19,18 @@ async fn handler(update: tg_flows::Update, tele: &Telegram) {
         let chat_id = msg.chat.id;
 
         let of = OpenAIFlows::new();
-        let co = chat::ChatOptions {
+        let mut co = chat::ChatOptions {
             max_tokens: Some(50),
             ..chat::ChatOptions::default()
         };
+
+        if text == "/restart" {
+            co.restart = true;
+        }
+
+        if let Some(history) = chat::chat_history(&chat_id.to_string(), 10) {
+            log::debug!("chat history: {:?}", history);
+        }
 
         log::debug!("Received msg {text} @{chat_id}");
 
