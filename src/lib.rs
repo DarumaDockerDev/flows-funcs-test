@@ -19,10 +19,13 @@ async fn handle<B: Bot>(bot: &B, msg: Message) {
     let channel_id = msg.channel_id;
     let content = msg.content;
 
-    log::debug!("-------------");
     if msg.author.bot {
         log::debug!("message from bot");
         return;
+    }
+
+    if let Some(history) = chat::chat_history(channel_id.as_u64().to_string().as_str(), 3) {
+        log::debug!("chat history: {:?}", history);
     }
 
     let cf = ClaudeFlows::new();
