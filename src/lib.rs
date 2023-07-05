@@ -1,9 +1,6 @@
 use flowsnet_platform_sdk::logger;
+use google_cloud_service_flows::cloud_vision::text_detection;
 use lambda_flows::{request_received, send_response};
-use openai_flows::{
-    chat::{ChatModel, ChatOptions},
-    OpenAIFlows,
-};
 use serde_json::Value;
 use std::collections::HashMap;
 
@@ -15,24 +12,9 @@ pub async fn run() {
 }
 
 async fn handler(_qry: HashMap<String, Value>, body: Vec<u8>) {
-    let co = ChatOptions {
-        model: ChatModel::GPT35Turbo,
-        restart: false,
-        system_prompt: None,
-    };
-    let of = OpenAIFlows::new();
-
-    let r = match of
-        .chat_completion(
-            "any_conversation_id",
-            String::from_utf8_lossy(&body).into_owned().as_str(),
-            &co,
-        )
+    let r = text_detection::text_detection(String::from_utf8_lossy(&body).into_owned())
         .await
-    {
-        Ok(c) => c.choice,
-        Err(e) => e,
-    };
+        .unwrap();
 
     send_response(
         200,
