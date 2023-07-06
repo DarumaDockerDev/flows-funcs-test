@@ -17,7 +17,6 @@ async fn handler(_qry: HashMap<String, Value>, body: Vec<u8>) {
     //     .unwrap();
 
     let co = chat::ChatOptions {
-        restart: true,
         ..Default::default()
     };
 
