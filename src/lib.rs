@@ -1,5 +1,5 @@
 use flowsnet_platform_sdk::logger;
-use google_cloud_service_flows::cloud_vision::text_detection;
+use google_cloud_service_flows::{cloud_vision::text_detection, vertex::chat};
 use lambda_flows::{request_received, send_response};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -16,12 +16,32 @@ async fn handler(_qry: HashMap<String, Value>, body: Vec<u8>) {
         .await
         .unwrap();
 
-    send_response(
-        200,
-        vec![(
-            String::from("content-type"),
-            String::from("text/plain; charset=UTF-8"),
-        )],
-        r.as_bytes().to_vec(),
-    );
+    log::info!("{r}");
+
+    let co = chat::ChatOptions {
+        ..Default::default()
+    };
+
+    match chat::chat("test-chat-for-vertex", &r, &co).await {
+        Ok(x) => {
+            send_response(
+                200,
+                vec![(
+                    String::from("content-type"),
+                    String::from("text/plain; charset=UTF-8"),
+                )],
+                x.as_bytes().to_vec(),
+            );
+        }
+        Err(e) => {
+            send_response(
+                500,
+                vec![(
+                    String::from("content-type"),
+                    String::from("text/plain; charset=UTF-8"),
+                )],
+                e.as_bytes().to_vec(),
+            );
+        }
+    }
 }
