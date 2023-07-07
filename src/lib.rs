@@ -20,6 +20,9 @@ async fn handler(_qry: HashMap<String, Value>, body: Vec<u8>) {
         ..Default::default()
     };
 
+    let his = chat::chat_history("test-chat-for-vertex", 0);
+    log::debug!("{:?}", his);
+
     match chat::chat(
         "test-chat-for-vertex",
         String::from_utf8_lossy(&body).into_owned().as_str(),
