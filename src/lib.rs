@@ -11,7 +11,8 @@ pub async fn run() {
     request_received(handler).await;
 }
 
-async fn handler(_qry: HashMap<String, Value>, body: Vec<u8>) {
+async fn handler(headers: Vec<(String, String)>, _qry: HashMap<String, Value>, body: Vec<u8>) {
+    println!("{:?}", headers);
     // let _r = text_detection::text_detection(String::from_utf8_lossy(&body).into_owned())
     //     .await
     //     .unwrap();
