@@ -1,4 +1,6 @@
-use discord_flows::{Bot, EventModel, ProvidedBot};
+use discord_flows::{
+    model::application::interaction::InteractionResponseType, Bot, EventModel, ProvidedBot,
+};
 use flowsnet_platform_sdk::logger;
 
 const CHANNEL_ID: u64 = 1090160755522928640;
@@ -17,14 +19,16 @@ async fn handle<B: Bot>(bot: &B, em: EventModel) {
     match em {
         EventModel::ApplicationCommand(ac) => {
             let client = bot.get_client();
-            let channel_id = ac.channel_id;
-            let content = ac.data.name;
 
             _ = client
-                .send_message(
-                    channel_id.into(),
+                .create_interaction_response(
+                    ac.id.into(),
+                    &ac.token,
                     &serde_json::json!({
-                        "content": content,
+                        "type": InteractionResponseType::ChannelMessageWithSource as u8,
+                        "data": {
+                            "content": "Pong"
+                        }
                     }),
                 )
                 .await;
