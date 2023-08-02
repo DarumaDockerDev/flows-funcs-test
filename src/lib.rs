@@ -12,17 +12,8 @@ pub async fn run() {
 }
 
 async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
-    println!("in wasm. before request");
-    /*
-    let mut writer = Vec::new();
-    request::get(
-        "http://127.0.0.1:8094/lambda/aPz1iwP6r4?city=beijing",
-        &mut writer,
-    );
-    */
     thread::sleep(Duration::from_secs(10));
 
-    println!("in wasm. passed request");
     let city = qry.get("city").unwrap_or(&Value::Null).as_str();
     let resp = match city {
         Some(c) => get_weather(c).map(|w| {
@@ -90,7 +81,7 @@ struct Wind {
 
 fn get_weather(city: &str) -> Result<ApiResult, String> {
     let mut writer = Vec::new();
-    let api_key = std::env::var("API_KEY").unwrap();
+    let api_key = "d7708b2a44c24775d4845c07a994e7a0";
     let query_str = format!(
         "https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={api_key}"
     );
