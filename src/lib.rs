@@ -27,11 +27,40 @@ async fn handle<B: Bot>(bot: &B, em: EventModel) {
                     &serde_json::json!({
                         "type": InteractionResponseType::ChannelMessageWithSource as u8,
                         "data": {
-                            "content": "Pong"
+                            "content": "Waiting..."
                         }
                     }),
                 )
                 .await;
+            client.set_application_id(ac.application_id.into());
+            _ = client
+                .edit_original_interaction_response(
+                    &ac.token,
+                    &serde_json::json!({
+                        "content": "Pong"
+                    }),
+                )
+                .await;
+
+            if let Ok(m) = client
+                .create_followup_message(
+                    &ac.token,
+                    &serde_json::json!({
+                        "content": "PongPong"
+                    }),
+                )
+                .await
+            {
+                _ = client
+                    .edit_followup_message(
+                        &ac.token,
+                        m.id.into(),
+                        &serde_json::json!({
+                            "content": "PongPongPong"
+                        }),
+                    )
+                    .await;
+            }
         }
         EventModel::Message(msg) => {
             let client = bot.get_client();
