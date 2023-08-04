@@ -2,6 +2,7 @@ use discord_flows::{
     model::application::interaction::InteractionResponseType, Bot, EventModel, ProvidedBot,
 };
 use flowsnet_platform_sdk::logger;
+use std::time::Duration;
 
 const CHANNEL_ID: u64 = 1090160755522928640;
 
@@ -25,13 +26,11 @@ async fn handle<B: Bot>(bot: &B, em: EventModel) {
                     ac.id.into(),
                     &ac.token,
                     &serde_json::json!({
-                        "type": InteractionResponseType::ChannelMessageWithSource as u8,
-                        "data": {
-                            "content": "Waiting..."
-                        }
+                        "type": InteractionResponseType::DeferredChannelMessageWithSource as u8,
                     }),
                 )
                 .await;
+            tokio::time::sleep(Duration::from_secs(3)).await;
             client.set_application_id(ac.application_id.into());
             _ = client
                 .edit_original_interaction_response(
