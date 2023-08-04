@@ -2,7 +2,6 @@ use std::{collections::HashMap, thread, time::Duration};
 
 use http_req::request;
 use lambda_flows::{request_received, send_response};
-use serde::Deserialize;
 use serde_json::Value;
 
 #[no_mangle]
@@ -11,30 +10,15 @@ pub async fn run() {
     request_received(handler).await;
 }
 
-async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
-    thread::sleep(Duration::from_secs(10));
+async fn handler(_qry: HashMap<String, Value>, _body: Vec<u8>) {
+    // thread::sleep(Duration::from_secs(10));
 
-    let city = qry.get("city").unwrap_or(&Value::Null).as_str();
-    let resp = match city {
-        Some(c) => get_weather(c).map(|w| {
-            format!(
-                "Today: {},
-Low temperature: {} °C,
-High temperature: {} °C,
-Wind Speed: {} km/h",
-                w.weather
-                    .first()
-                    .unwrap_or(&Weather {
-                        main: "Unknown".to_string()
-                    })
-                    .main,
-                w.main.temp_min as i32,
-                w.main.temp_max as i32,
-                w.wind.speed as i32
-            )
-        }),
-        None => Err(String::from("No city in query")),
-    };
+    let mut writer = Vec::new();
+    let query_str = format!("https://hub.dummyapis.com/delay?seconds=3");
+
+    let resp = request::get(query_str, &mut writer)
+        .map_err(|e| e.to_string())
+        .and_then(|_| String::from_utf8(writer).map_err(|_| "Unexpected error".to_string()));
 
     match resp {
         Ok(r) => send_response(
@@ -54,43 +38,4 @@ Wind Speed: {} km/h",
             e.as_bytes().to_vec(),
         ),
     }
-}
-
-#[derive(Deserialize)]
-struct ApiResult {
-    weather: Vec<Weather>,
-    main: Main,
-    wind: Wind,
-}
-
-#[derive(Deserialize)]
-struct Weather {
-    main: String,
-}
-
-#[derive(Deserialize)]
-struct Main {
-    temp_max: f64,
-    temp_min: f64,
-}
-
-#[derive(Deserialize)]
-struct Wind {
-    speed: f64,
-}
-
-fn get_weather(city: &str) -> Result<ApiResult, String> {
-    let mut writer = Vec::new();
-    let api_key = "d7708b2a44c24775d4845c07a994e7a0";
-    let query_str = format!(
-        "https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={api_key}"
-    );
-
-    request::get(query_str, &mut writer)
-        .map_err(|e| e.to_string())
-        .and_then(|_| {
-            serde_json::from_slice::<ApiResult>(&writer).map_err(|_| {
-                "Please check if you've typed the name of your city correctly".to_string()
-            })
-        })
 }
