@@ -11,7 +11,7 @@ pub async fn run() {
     request_received(handler).await;
 }
 
-async fn handler(_qry: HashMap<String, Value>, body: Vec<u8>) {
+async fn handler(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, body: Vec<u8>) {
     let co = ChatOptions {
         model: Some("gpt-3.5-turbo"),
         token_limit: 4096,
