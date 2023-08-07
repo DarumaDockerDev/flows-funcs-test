@@ -12,16 +12,15 @@ pub async fn run() {
 }
 
 async fn handler(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, body: Vec<u8>) {
+    let model = std::env::var("LLM_SERVICE_MODEL").ok();
     let co = ChatOptions {
-        model: Some("gpt-3.5-turbo"),
+        model: model.as_deref(),
         token_limit: 4096,
         ..Default::default()
     };
+    let endpoint = std::env::var("LLM_SERVICE_ENDPOINT").unwrap();
     let api_key = std::env::var("OPENAI_API_KEY").unwrap();
-    let lf = LLMServiceFlows::new(
-        "https://api.openai.com/v1/chat/completions",
-        api_key.as_str(),
-    );
+    let lf = LLMServiceFlows::new(endpoint.as_str(), api_key.as_str());
 
     let r = match lf
         .chat_completion(
