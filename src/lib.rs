@@ -20,7 +20,8 @@ async fn handler(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, 
     };
     let endpoint = std::env::var("LLM_SERVICE_ENDPOINT").unwrap();
     let api_key = std::env::var("OPENAI_API_KEY").unwrap();
-    let lf = LLMServiceFlows::new(endpoint.as_str(), api_key.as_str());
+    let mut lf = LLMServiceFlows::new(endpoint.as_str());
+    lf.set_api_key(api_key.as_str());
 
     let r = match lf
         .chat_completion(
