@@ -1,5 +1,5 @@
 use discord_flows::{
-    model::application::interaction::InteractionResponseType, Bot, EventModel, ProvidedBot,
+    model::application::interaction::InteractionResponseType, Bot, DefaultBot, EventModel,
 };
 use flowsnet_platform_sdk::logger;
 use std::time::Duration;
@@ -12,8 +12,9 @@ pub async fn run() {
     logger::init();
     let token = std::env::var("DISCORD_TOKEN").unwrap();
 
-    let bot = ProvidedBot::new(token);
-    bot.listen(|em| handle(&bot, em)).await;
+    let bot = DefaultBot {};
+    bot.listen_to_channel(CHANNEL_ID, |em| handle(&bot, em))
+        .await;
 }
 
 async fn handle<B: Bot>(bot: &B, em: EventModel) {
