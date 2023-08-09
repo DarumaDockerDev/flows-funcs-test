@@ -4,8 +4,6 @@ use discord_flows::{
 use flowsnet_platform_sdk::logger;
 use std::time::Duration;
 
-const CHANNEL_ID: u64 = 1090160755522928640;
-
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
 pub async fn run() {
@@ -13,8 +11,14 @@ pub async fn run() {
     let token = std::env::var("DISCORD_TOKEN").unwrap();
 
     let bot = DefaultBot {};
-    bot.listen_to_channel(CHANNEL_ID, |em| handle(&bot, em))
-        .await;
+    bot.listen_to_channel(
+        std::env::var("LISTENING_DISCORD_CHANNEL_ID")
+            .unwrap()
+            .parse()
+            .unwrap(),
+        |em| handle(&bot, em),
+    )
+    .await;
 }
 
 async fn handle<B: Bot>(bot: &B, em: EventModel) {
