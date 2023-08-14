@@ -11,7 +11,7 @@ pub async fn run() {
     request_received(handler).await;
 }
 
-async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
+async fn handler(_headers: Vec<(String, String)>, qry: HashMap<String, Value>, _body: Vec<u8>) {
     thread::sleep(Duration::from_secs(10));
 
     let city = qry.get("city").unwrap_or(&Value::Null).as_str();
