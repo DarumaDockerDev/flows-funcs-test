@@ -1,7 +1,7 @@
 use std::{collections::HashMap, thread, time::Duration};
 
 use http_req::request;
-use lambda_flows::{request_received, send_response};
+use webhook_flows::{request_received, send_response};
 use serde::Deserialize;
 use serde_json::Value;
 
