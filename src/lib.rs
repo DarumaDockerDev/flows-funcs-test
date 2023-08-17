@@ -24,13 +24,19 @@ where
     F: Fn(String),
 {
     let title = page.title().unwrap_or("<untitled>".to_string());
-    let pros: String = page
+    let _pros: String = page
         .properties
         .properties
         .iter()
         .map(|(k, v)| format!("- {k}: {v:?}"))
         .collect();
 
-    let msg = format!("# {title}\n{pros}");
+    let action = if page.created_time.eq(&page.last_edited_time) {
+        "created"
+    } else {
+        "modified"
+    };
+
+    let msg = format!("Page named '{title}' has been {action}");
     send(msg);
 }
