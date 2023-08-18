@@ -9,7 +9,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-discord-flows = "0.5"
+discord-flows = "0.6"
 flowsnet-platform-sdk = "0.1.4"
 log = "0.4"
 serde_json = "1.0.96"
