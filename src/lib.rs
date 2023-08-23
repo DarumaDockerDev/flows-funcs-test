@@ -1,16 +1,17 @@
 use std::{collections::HashMap, thread, time::Duration};
 
 use http_req::request;
-use webhook_flows::{request_received, send_response};
+use webhook_flows::{request_received, request_handler, send_response};
 use serde::Deserialize;
 use serde_json::Value;
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
-pub async fn run() {
-    request_received(handler).await;
+pub async fn on_deploy() {
+    request_received().await;
 }
 
+#[request_handler]
 async fn handler(_headers: Vec<(String, String)>, qry: HashMap<String, Value>, _body: Vec<u8>) {
     thread::sleep(Duration::from_secs(10));
 
