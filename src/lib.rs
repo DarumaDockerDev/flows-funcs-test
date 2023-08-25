@@ -4,7 +4,7 @@ use std::env;
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
-pub async fn run() {
+pub async fn on_deploy() {
     let database = env::var("notion_database").unwrap();
 
     listen_to_database_update(database).await;
