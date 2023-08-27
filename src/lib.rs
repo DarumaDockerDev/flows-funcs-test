@@ -1,50 +1,22 @@
 use flowsnet_platform_sdk::logger;
-use openai_flows::{chat, OpenAIFlows};
-use tg_flows::{listen_to_update, Telegram, UpdateKind};
+use tg_flows::{listen_to_update, update_handler, Telegram, UpdateKind};
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
-pub async fn run() {
+pub async fn on_deploy() {
     let telegram_token = std::env::var("telegram_token").unwrap();
-    let tele = Telegram::new(telegram_token.clone());
-
-    logger::init();
-
-    listen_to_update(telegram_token, |update| handler(update, &tele)).await;
+    listen_to_update(telegram_token).await;
 }
 
-async fn handler(update: tg_flows::Update, tele: &Telegram) {
+#[update_handler]
+async fn handler(update: tg_flows::Update) {
+    logger::init();
+    let telegram_token = std::env::var("telegram_token").unwrap();
+    let tele = Telegram::new(telegram_token);
+
     if let UpdateKind::Message(msg) = update.kind {
         let text = msg.text().unwrap_or("");
         let chat_id = msg.chat.id;
-
-        let of = OpenAIFlows::new();
-        let mut co = chat::ChatOptions {
-            max_tokens: Some(50),
-            ..chat::ChatOptions::default()
-        };
-
-        if text == "/restart" {
-            co.restart = true;
-        }
-
-        if let Some(history) = chat::chat_history(&chat_id.to_string(), 10) {
-            log::debug!("chat history: {:?}", history);
-        }
-
-        log::debug!("Received msg {text} @{chat_id}");
-
-        let c = of.chat_completion(&chat_id.to_string(), &text, &co).await;
-
-        if let Ok(c) = c {
-            if c.restarted {
-                _ = tele.send_message(chat_id, "Let's start a new conversation!");
-            }
-
-            // _ = tele.edit_message_text(chat_id, m.id, c.choice);
-            _ = tele.send_message(chat_id, c.choice);
-        } else {
-            _ = tele.send_message(chat_id, "I have no choice");
-        }
+        _ = tele.send_message(chat_id, text);
     }
 }

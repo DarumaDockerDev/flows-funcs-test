@@ -1,5 +1,5 @@
 [package]
-name = "github-func-test"
+name = "tg-chat"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 openai-flows = "0.8"
-tg-flows = "0.2.0"
+tg-flows = "0.3"
 serde_json = "1.0.95"
 tokio_wasi = { version = "1.25.1", features = ["macros", "rt"] }
 flowsnet-platform-sdk = "0.1"
