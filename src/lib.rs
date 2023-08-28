@@ -17,7 +17,7 @@ pub async fn on_deploy() {
     let _token = std::env::var("DISCORD_TOKEN").unwrap();
 
     let bot = DefaultBot {};
-    bot.listen_to_messages_from_channel(
+    bot.listen_to_application_commands_from_channel(
         std::env::var("LISTENING_DISCORD_CHANNEL_ID")
             .unwrap()
             .parse()
