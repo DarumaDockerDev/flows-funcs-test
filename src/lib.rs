@@ -24,6 +24,13 @@ pub async fn on_deploy() {
             .unwrap(),
     )
     .await;
+    bot.listen_to_messages_from_channel(
+        std::env::var("LISTENING_DISCORD_CHANNEL_ID")
+            .unwrap()
+            .parse()
+            .unwrap(),
+    )
+    .await;
 }
 
 #[message_handler]
