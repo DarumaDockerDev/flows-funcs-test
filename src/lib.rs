@@ -8,11 +8,12 @@ use github_flows::{
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
 pub async fn run() {
-    logger::init();
+    let owner = std::env::var("GITHUB_OWNER").unwrap();
+    let repo = std::env::var("GITHUB_REPO").unwrap();
     listen_to_event(
-        &GithubLogin::Provided(String::from("DarumaDockerDev")),
-        "DarumaDockerDev",
-        "github-func-test",
+        &GithubLogin::Provided(owner.clone()),
+        owner.as_str(),
+        repo.as_str(),
         vec!["issue_comment"],
         handler,
     )
@@ -20,14 +21,19 @@ pub async fn run() {
 }
 
 async fn handler(payload: EventPayload) {
+    logger::init();
     log::debug!("running github issue comment handler");
+
+    let owner = std::env::var("GITHUB_OWNER").unwrap();
+    let repo = std::env::var("GITHUB_REPO").unwrap();
+
     if let EventPayload::IssueCommentEvent(e) = payload {
         let issue_number = e.comment.id.0;
 
         // installed app login
-        let octo = get_octo(&GithubLogin::Provided(String::from("DarumaDockerDev")));
+        let octo = get_octo(&GithubLogin::Provided(owner.clone()));
 
-        octo.issues("DarumaDockerDev", "github-func-test")
+        octo.issues(owner.as_str(), repo.as_str())
             .create_comment_reaction(issue_number, ReactionContent::Rocket)
             .await
             .unwrap();
