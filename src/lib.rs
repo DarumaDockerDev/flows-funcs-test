@@ -1,13 +1,13 @@
 use flowsnet_platform_sdk::logger;
 use github_flows::{
-    get_octo, listen_to_event,
+    event_handler, get_octo, listen_to_event,
     octocrab::models::{events::payload::EventPayload, reactions::ReactionContent},
     GithubLogin,
 };
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
-pub async fn run() {
+pub async fn on_deploy() {
     let owner = std::env::var("GITHUB_OWNER").unwrap();
     let repo = std::env::var("GITHUB_REPO").unwrap();
     listen_to_event(
@@ -15,11 +15,11 @@ pub async fn run() {
         owner.as_str(),
         repo.as_str(),
         vec!["issue_comment"],
-        handler,
     )
     .await;
 }
 
+#[event_handler]
 async fn handler(payload: EventPayload) {
     logger::init();
     log::debug!("running github issue comment handler");
