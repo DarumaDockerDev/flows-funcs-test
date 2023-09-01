@@ -82,7 +82,7 @@ struct Wind {
 
 fn get_weather(city: &str) -> Result<ApiResult, String> {
     let mut writer = Vec::new();
-    let api_key = "d7708b2a44c24775d4845c07a994e7a0";
+    let api_key = "09a55b004ce2f065b903015e3284de35";
     let query_str = format!(
         "https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={api_key}"
     );
