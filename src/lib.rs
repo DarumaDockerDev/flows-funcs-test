@@ -1,14 +1,14 @@
 use std::{collections::HashMap, thread, time::Duration};
 
 use http_req::request;
-use webhook_flows::{request_received, request_handler, send_response};
 use serde::Deserialize;
 use serde_json::Value;
+use webhook_flows::{create_endpoint, request_handler, send_response};
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
 pub async fn on_deploy() {
-    request_received().await;
+    create_endpoint().await;
 }
 
 #[request_handler]
