@@ -5,7 +5,7 @@ use discord_flows::{
         prelude::application::interaction::application_command::ApplicationCommandInteraction,
         Message,
     },
-    Bot, DefaultBot,
+    Bot, ProvidedBot,
 };
 use flowsnet_platform_sdk::logger;
 use std::time::Duration;
@@ -14,9 +14,9 @@ use std::time::Duration;
 #[tokio::main(flavor = "current_thread")]
 pub async fn on_deploy() {
     logger::init();
-    let _token = std::env::var("DISCORD_TOKEN").unwrap();
+    let token = std::env::var("DISCORD_TOKEN").unwrap();
 
-    let bot = DefaultBot {};
+    let bot = ProvidedBot::new(token);
     bot.listen_to_application_commands_from_channel(
         std::env::var("LISTENING_DISCORD_CHANNEL_ID")
             .unwrap()
@@ -36,9 +36,9 @@ pub async fn on_deploy() {
 #[message_handler]
 pub async fn message_handler(msg: Message) {
     logger::init();
-    let _token = std::env::var("DISCORD_TOKEN").unwrap();
+    let token = std::env::var("DISCORD_TOKEN").unwrap();
 
-    let bot = DefaultBot {};
+    let bot = ProvidedBot::new(token);
     let client = bot.get_client();
     let channel_id = msg.channel_id;
     let content = msg.content;
@@ -61,8 +61,8 @@ pub async fn message_handler(msg: Message) {
 #[application_command_handler]
 pub async fn application_command_handler(ac: ApplicationCommandInteraction) {
     logger::init();
-    let _token = std::env::var("DISCORD_TOKEN").unwrap();
-    let bot = DefaultBot {};
+    let token = std::env::var("DISCORD_TOKEN").unwrap();
+    let bot = ProvidedBot::new(token);
 
     let client = bot.get_client();
 
