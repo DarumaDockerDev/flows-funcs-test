@@ -65,6 +65,7 @@ pub async fn application_command_handler(ac: ApplicationCommandInteraction) {
     let bot = ProvidedBot::new(token);
 
     let client = bot.get_client();
+    log::debug!("-------------------");
 
     _ = client
         .create_interaction_response(
