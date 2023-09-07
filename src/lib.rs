@@ -67,7 +67,7 @@ pub async fn application_command_handler(ac: ApplicationCommandInteraction) {
     let client = bot.get_client();
     log::debug!("-------------------");
 
-    _ = client
+    let x = client
         .create_interaction_response(
             ac.id.into(),
             &ac.token,
@@ -76,6 +76,7 @@ pub async fn application_command_handler(ac: ApplicationCommandInteraction) {
             }),
         )
         .await;
+    log::debug!("{:?}", x);
     tokio::time::sleep(Duration::from_secs(3)).await;
     client.set_application_id(ac.application_id.into());
     _ = client
