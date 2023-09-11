@@ -22,6 +22,7 @@ async fn handler(update: tg_flows::Update) {
         let of = OpenAIFlows::new();
         let mut co = chat::ChatOptions {
             max_tokens: Some(50),
+            post_prompt: Some("Do not give me any information about procedures and service features that are not mentioned in the PROVIDED CONTEXT."),
             ..chat::ChatOptions::default()
         };
         log::debug!("chat id: {}", chat_id);
