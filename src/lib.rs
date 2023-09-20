@@ -1,12 +1,14 @@
 use flowsnet_platform_sdk::logger;
 use openai_flows::{chat, OpenAIFlows};
 use tg_flows::{listen_to_update, update_handler, Telegram, UpdateKind};
+use webhook_flows::create_endpoint;
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
 pub async fn on_deploy() {
     let telegram_token = std::env::var("telegram_token").unwrap();
     listen_to_update(telegram_token).await;
+    create_endpoint().await;
 }
 
 #[update_handler]
