@@ -19,7 +19,7 @@ async fn handler(
     _body: Vec<u8>,
 ) {
     println!("-----------------");
-    thread::sleep(Duration::from_secs(10));
+    tokio::time::sleep(Duration::from_secs(10)).await;
     println!("<<<<<<<<<<<<<<<<<");
 
     let city = qry.get("city").unwrap_or(&Value::Null).as_str();
