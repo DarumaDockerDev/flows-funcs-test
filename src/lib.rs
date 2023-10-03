@@ -18,8 +18,7 @@ async fn handler(
     qry: HashMap<String, Value>,
     _body: Vec<u8>,
 ) {
-    // thread::sleep(Duration::from_secs(10));
-    println!("{:?}", subpath);
+    thread::sleep(Duration::from_secs(10));
 
     let city = qry.get("city").unwrap_or(&Value::Null).as_str();
     let resp = match city {
