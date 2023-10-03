@@ -124,6 +124,7 @@ async fn webhook_handler(
 ) {
     match qry.get("delay") {
         Some(d) => {
+            println!("-----------------");
             let mut writer = Vec::new(); //container for body of a response
             let url = format!(
                 "https://hub.dummyapis.com/delay?seconds={}",
@@ -133,6 +134,7 @@ async fn webhook_handler(
                 Ok(res) => send_response(res.status_code().into(), vec![], writer),
                 Err(e) => send_response(500, vec![], e.to_string().as_bytes().to_vec()),
             }
+            println!("<<<<<<<<<<<<<<<<<");
         }
         None => send_response(400, vec![], vec![]),
     }
