@@ -1,4 +1,4 @@
-use std::{collections::HashMap, thread, time::Duration};
+use std::collections::HashMap;
 
 use http_req::request;
 use serde::Deserialize;
@@ -18,10 +18,6 @@ async fn handler(
     qry: HashMap<String, Value>,
     _body: Vec<u8>,
 ) {
-    println!("-----------------");
-    tokio::time::sleep(Duration::from_secs(10)).await;
-    println!("<<<<<<<<<<<<<<<<<");
-
     let city = qry.get("city").unwrap_or(&Value::Null).as_str();
     let resp = match city {
         Some(c) => get_weather(c).map(|w| {
