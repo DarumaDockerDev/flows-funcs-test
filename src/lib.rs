@@ -126,7 +126,7 @@ async fn webhook_handler(
         Some(d) => {
             let mut writer = Vec::new(); //container for body of a response
             let url = format!(
-                "https://hub.dummyapis.com/delay?seconds={}",
+                "http://hub.dummyapis.com/delay?seconds={}",
                 d.as_str().unwrap_or("10").parse().unwrap_or(10)
             );
             match request::get(url, &mut writer) {
