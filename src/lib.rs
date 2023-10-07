@@ -5,6 +5,8 @@ use serde::Deserialize;
 use serde_json::Value;
 use webhook_flows::{create_endpoint, request_handler, send_response};
 
+use chrono::prelude::*;
+
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
 pub async fn on_deploy() {
@@ -18,6 +20,10 @@ async fn handler(
     qry: HashMap<String, Value>,
     _body: Vec<u8>,
 ) {
+    flowsnet_platform_sdk::logger::init();
+    let local: DateTime<Local> = Local::now();
+
+    log::debug!("----- before request: {}", local);
     let city = qry.get("city").unwrap_or(&Value::Null).as_str();
     let resp = match city {
         Some(c) => get_weather(c).map(|w| {
@@ -39,6 +45,7 @@ Wind Speed: {} km/h",
         }),
         None => Err(String::from("No city in query")),
     };
+    log::debug!("----- after request: {}", local);
 
     match resp {
         Ok(r) => send_response(
