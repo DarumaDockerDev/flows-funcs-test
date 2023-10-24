@@ -22,10 +22,20 @@ async fn options(
 ) {
     send_response(
         200,
-        vec![(
-            String::from("Allow"),
-            String::from("OPTIONS, GET, HEAD, POST"),
-        )],
+        vec![
+            (
+                String::from("Allow"),
+                String::from("OPTIONS, GET, HEAD, POST"),
+            ),
+            (
+                String::from("Access-Control-Allow-Origin"),
+                String::from("http://127.0.0.1"),
+            ),
+            (
+                String::from("Access-Control-Allow-Methods"),
+                String::from("POST, GET, OPTIONS"),
+            ),
+        ],
         vec![],
     )
 }
