@@ -13,24 +13,24 @@ pub async fn on_deploy() {
     create_endpoint().await;
 }
 
-// #[request_handler(OPTIONS)]
-// async fn options(
-//     _headers: Vec<(String, String)>,
-//     subpath: String,
-//     qry: HashMap<String, Value>,
-//     _body: Vec<u8>,
-// ) {
-//     send_response(
-//         200,
-//         vec![(
-//             String::from("Allow"),
-//             String::from("OPTIONS, GET, HEAD, POST"),
-//         )],
-//         vec![],
-//     )
-// }
+#[request_handler(OPTIONS)]
+async fn options(
+    _headers: Vec<(String, String)>,
+    subpath: String,
+    qry: HashMap<String, Value>,
+    _body: Vec<u8>,
+) {
+    send_response(
+        200,
+        vec![(
+            String::from("Allow"),
+            String::from("OPTIONS, GET, HEAD, POST"),
+        )],
+        vec![],
+    )
+}
 
-#[request_handler]
+#[request_handler(GET, POST)]
 async fn handler(
     _headers: Vec<(String, String)>,
     subpath: String,
