@@ -11,7 +11,6 @@ use chrono::prelude::*;
 #[tokio::main(flavor = "current_thread")]
 pub async fn on_deploy() {
     create_endpoint().await;
-    panic!("123");
 }
 
 #[request_handler(OPTIONS)]
@@ -21,6 +20,7 @@ async fn options(
     qry: HashMap<String, Value>,
     _body: Vec<u8>,
 ) {
+    panic!("123");
     send_response(
         200,
         vec![
