@@ -3,9 +3,11 @@ use std::collections::HashMap;
 use http_req::request;
 use serde::Deserialize;
 use serde_json::Value;
-use webhook_flows::{create_endpoint, request_handler, send_response};
-
-use chrono::prelude::*;
+use webhook_flows::{
+    create_endpoint, request_handler,
+    route::{new_handler, route, Router},
+    send_response, Method,
+};
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
@@ -13,14 +15,30 @@ pub async fn on_deploy() {
     create_endpoint().await;
 }
 
-#[request_handler(OPTIONS)]
+#[request_handler]
+async fn hh() {
+    let mut router = Router::new();
+    router
+        .insert("/options", (vec![Method::OPTIONS], new_handler(options)))
+        .unwrap();
+    router
+        .insert(
+            "/get/:city",
+            (vec![Method::GET, Method::POST], new_handler(handler)),
+        )
+        .unwrap();
+    if let Err(e) = route(router).await {
+        send_response(404, vec![], b"No route matched".to_vec())
+    }
+}
+
+// #[request_handler(OPTIONS)]
 async fn options(
     _headers: Vec<(String, String)>,
-    subpath: String,
-    qry: HashMap<String, Value>,
+    _subpath: String,
+    _qry: HashMap<String, Value>,
     _body: Vec<u8>,
 ) {
-    panic!("123");
     send_response(
         200,
         vec![
@@ -38,20 +56,18 @@ async fn options(
             ),
         ],
         vec![],
-    )
+    );
 }
 
-#[request_handler(GET, POST)]
+// #[request_handler(GET, POST)]
 async fn handler(
     _headers: Vec<(String, String)>,
-    subpath: String,
+    _subpath: String,
     qry: HashMap<String, Value>,
     _body: Vec<u8>,
 ) {
     flowsnet_platform_sdk::logger::init();
-    let local: DateTime<Local> = Local::now();
 
-    log::debug!("----- before request: {}", local);
     let city = qry.get("city").unwrap_or(&Value::Null).as_str();
     let resp = match city {
         Some(c) => get_weather(c).map(|w| {
@@ -73,7 +89,6 @@ Wind Speed: {} km/h",
         }),
         None => Err(String::from("No city in query")),
     };
-    log::debug!("----- after request: {}", local);
 
     match resp {
         Ok(r) => send_response(
@@ -84,14 +99,16 @@ Wind Speed: {} km/h",
             )],
             r.as_bytes().to_vec(),
         ),
-        Err(e) => send_response(
-            400,
-            vec![(
-                String::from("content-type"),
-                String::from("text/html; charset=UTF-8"),
-            )],
-            e.as_bytes().to_vec(),
-        ),
+        Err(e) => {
+            send_response(
+                400,
+                vec![(
+                    String::from("content-type"),
+                    String::from("text/html; charset=UTF-8"),
+                )],
+                e.as_bytes().to_vec(),
+            );
+        }
     }
 }
 
