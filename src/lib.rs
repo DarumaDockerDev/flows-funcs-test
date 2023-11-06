@@ -5,7 +5,7 @@ use serde::Deserialize;
 use serde_json::Value;
 use webhook_flows::{
     create_endpoint, request_handler,
-    route::{new_handler, route, Router},
+    route::{route, wrap_handler, RouteError, Router},
     send_response, Method,
 };
 
@@ -19,23 +19,30 @@ pub async fn on_deploy() {
 async fn hh() {
     let mut router = Router::new();
     router
-        .insert("/options", (vec![Method::OPTIONS], new_handler(options)))
+        .insert("/options", (vec![Method::OPTIONS], wrap_handler(options)))
         .unwrap();
     router
         .insert(
             "/get/:city",
-            (vec![Method::GET, Method::POST], new_handler(handler)),
+            (vec![Method::GET, Method::POST], wrap_handler(handler)),
         )
         .unwrap();
     if let Err(e) = route(router).await {
-        send_response(404, vec![], b"No route matched".to_vec())
+        match e {
+            RouteError::NotFound => {
+                send_response(404, vec![], b"No route matched".to_vec());
+            }
+            RouteError::MethodNotAllowed => {
+                send_response(405, vec![], b"Method not allowed".to_vec());
+            }
+        }
     }
 }
 
 // #[request_handler(OPTIONS)]
 async fn options(
     _headers: Vec<(String, String)>,
-    _subpath: String,
+    // _subpath: String,
     _qry: HashMap<String, Value>,
     _body: Vec<u8>,
 ) {
@@ -62,7 +69,7 @@ async fn options(
 // #[request_handler(GET, POST)]
 async fn handler(
     _headers: Vec<(String, String)>,
-    _subpath: String,
+    // _subpath: String,
     qry: HashMap<String, Value>,
     _body: Vec<u8>,
 ) {
