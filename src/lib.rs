@@ -5,8 +5,8 @@ use serde::Deserialize;
 use serde_json::Value;
 use webhook_flows::{
     create_endpoint, request_handler,
-    route::{route, wrap_handler, RouteError, Router},
-    send_response, Method,
+    route::{get, options, route, RouteError, Router},
+    send_response,
 };
 
 #[no_mangle]
@@ -16,16 +16,11 @@ pub async fn on_deploy() {
 }
 
 #[request_handler]
-async fn hh() {
+async fn handler() {
     let mut router = Router::new();
+    router.insert("/options", vec![options(opt)]).unwrap();
     router
-        .insert("/options", (vec![Method::OPTIONS], wrap_handler(options)))
-        .unwrap();
-    router
-        .insert(
-            "/get/:city",
-            (vec![Method::GET, Method::POST], wrap_handler(handler)),
-        )
+        .insert("/get/:city", vec![options(opt), get(query)])
         .unwrap();
     if let Err(e) = route(router).await {
         match e {
@@ -40,7 +35,7 @@ async fn hh() {
 }
 
 // #[request_handler(OPTIONS)]
-async fn options(
+async fn opt(
     _headers: Vec<(String, String)>,
     // _subpath: String,
     _qry: HashMap<String, Value>,
@@ -67,7 +62,7 @@ async fn options(
 }
 
 // #[request_handler(GET, POST)]
-async fn handler(
+async fn query(
     _headers: Vec<(String, String)>,
     // _subpath: String,
     qry: HashMap<String, Value>,
