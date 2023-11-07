@@ -1,11 +1,15 @@
 use std::collections::HashMap;
 
 use http_req::request;
+use openai_flows::{
+    chat::{self, ChatModel, ChatOptions, ResponseFormat, ResponseFormatType},
+    OpenAIFlows,
+};
 use serde::Deserialize;
 use serde_json::Value;
 use webhook_flows::{
     create_endpoint, request_handler,
-    route::{get, options, route, RouteError, Router},
+    route::{get, options, post, route, RouteError, Router},
     send_response,
 };
 
@@ -22,6 +26,8 @@ async fn handler() {
     router
         .insert("/get/:city", vec![options(opt), get(query)])
         .unwrap();
+    router.insert("/openai", vec![post(openai)]).unwrap();
+
     if let Err(e) = route(router).await {
         match e {
             RouteError::NotFound => {
@@ -31,6 +37,25 @@ async fn handler() {
                 send_response(405, vec![], b"Method not allowed".to_vec());
             }
         }
+    }
+}
+
+async fn openai(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, body: Vec<u8>) {
+    let msg = String::from_utf8_lossy(&body).into_owned();
+
+    let of = OpenAIFlows::new();
+    let co = ChatOptions {
+        model: ChatModel::GPT4Turbo,
+        max_tokens: Some(500),
+        response_format: Some(ResponseFormat {
+            r#type: ResponseFormatType::JsonObject,
+        }),
+        ..chat::ChatOptions::default()
+    };
+
+    match of.chat_completion("test", &msg, &co).await {
+        Ok(c) => send_response(200, vec![], c.choice.into_bytes().to_vec()),
+        Err(e) => send_response(500, vec![], e.into_bytes().to_vec()),
     }
 }
 
