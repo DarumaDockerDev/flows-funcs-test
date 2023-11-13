@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 
+use async_openai_wasi::{
+    types::{CreateMessageRequestArgs, CreateRunRequestArgs, CreateThreadRequestArgs},
+    Client,
+};
 use http_req::request;
 use openai_flows::{
     chat::{self, ChatModel, ChatOptions, ResponseFormat, ResponseFormatType},
@@ -27,6 +31,7 @@ async fn handler() {
         .insert("/get/:city", vec![options(opt), get(query)])
         .unwrap();
     router.insert("/openai", vec![post(openai)]).unwrap();
+    router.insert("/assistant", vec![post(assistant)]).unwrap();
 
     if let Err(e) = route(router).await {
         match e {
@@ -38,6 +43,20 @@ async fn handler() {
             }
         }
     }
+}
+
+async fn assistant(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, body: Vec<u8>) {
+    let client = Client::new();
+
+    let query = [("limit", "10")];
+
+    let assistants = client.assistants().list(&query).await.unwrap();
+
+    send_response(
+        200,
+        vec![],
+        format!("assistants: {assistants:#?}").into_bytes().to_vec(),
+    );
 }
 
 async fn openai(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, body: Vec<u8>) {
