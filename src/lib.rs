@@ -33,14 +33,10 @@ async fn handler(update: tg_flows::Update) {
             Some(ti) => match text == "/restart" {
                 true => {
                     delete_thread(ti.as_str().unwrap()).await;
-                    None
+                    return;
                 }
-                false => Some(ti),
+                false => ti.as_str().unwrap().to_owned(),
             },
-            None => None,
-        };
-        let thread_id = match thread_id {
-            Some(ti) => ti.as_str().unwrap().to_owned(),
             None => {
                 let ti = create_thread().await;
                 store_flows::set(
