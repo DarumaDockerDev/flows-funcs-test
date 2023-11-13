@@ -29,34 +29,66 @@ async fn handler(update: tg_flows::Update) {
         let text = msg.text().unwrap_or("");
         let chat_id = msg.chat.id;
 
-        let response = run_message(String::from(text)).await;
+        let thread_id = match store_flows::get(chat_id.to_string().as_str()) {
+            Some(ti) => match text == "/restart" {
+                true => {
+                    delete_thread(ti.as_str().unwrap()).await;
+                    None
+                }
+                false => Some(ti),
+            },
+            None => None,
+        };
+        let thread_id = match thread_id {
+            Some(ti) => ti.as_str().unwrap().to_owned(),
+            None => {
+                let ti = create_thread().await;
+                store_flows::set(
+                    chat_id.to_string().as_str(),
+                    serde_json::Value::String(ti.clone()),
+                    None,
+                );
+                ti
+            }
+        };
 
+        let response = run_message(thread_id.as_str(), String::from(text)).await;
         _ = tele.send_message(chat_id, response);
     }
 }
 
-async fn create_thread() {
+async fn create_thread() -> String {
     let client = Client::new();
-    let thread_id = std::env::var("WASMEDGE_THREAD_ID").unwrap();
 
-    if let Err(_) = client.threads().retrieve(thread_id.as_str()).await {
-        let create_thread_request = CreateThreadRequestArgs::default().build().unwrap();
+    let create_thread_request = CreateThreadRequestArgs::default().build().unwrap();
 
-        match client.threads().create(create_thread_request).await {
-            Ok(to) => {
-                log::info!("New thread (ID: {}) created.", to.id);
-            }
-            Err(e) => {
-                log::error!("Failed to create thread: {:?}", e);
-            }
+    match client.threads().create(create_thread_request).await {
+        Ok(to) => {
+            log::info!("New thread (ID: {}) created.", to.id);
+            to.id
+        }
+        Err(e) => {
+            panic!("Failed to create thread. {:?}", e);
         }
     }
 }
 
-async fn run_message(text: String) -> String {
+async fn delete_thread(thread_id: &str) {
+    let client = Client::new();
+
+    match client.threads().delete(thread_id).await {
+        Ok(_) => {
+            log::info!("Old thread (ID: {}) deleted.", thread_id);
+        }
+        Err(e) => {
+            panic!("Failed to delete thread. {:?}", e);
+        }
+    }
+}
+
+async fn run_message(thread_id: &str, text: String) -> String {
     let client = Client::new();
     let assistant_id = std::env::var("WASMEDGE_ASSISTANT_ID").unwrap();
-    let thread_id = std::env::var("WASMEDGE_THREAD_ID").unwrap();
 
     let mut create_message_request = CreateMessageRequestArgs::default().build().unwrap();
     create_message_request.content = text;
