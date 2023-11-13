@@ -33,6 +33,7 @@ async fn handler(update: tg_flows::Update) {
             Some(ti) => match text == "/restart" {
                 true => {
                     delete_thread(ti.as_str().unwrap()).await;
+                    store_flows::del(chat_id.to_string().as_str());
                     return;
                 }
                 false => ti.as_str().unwrap().to_owned(),
