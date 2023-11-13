@@ -79,6 +79,8 @@ async fn run_message(text: String) -> String {
         .unwrap()
         .id;
 
+    log::debug!("run id: {run_id}");
+
     let mut result = Some("Timeout");
     for _ in 0..5 {
         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
@@ -86,8 +88,9 @@ async fn run_message(text: String) -> String {
             .threads()
             .runs(&thread_id)
             .retrieve(run_id.as_str())
-            .await
-            .unwrap();
+            .await;
+        log::debug!("run object: {run_object:#?}");
+        let run_object = run_object.unwrap();
         result = match run_object.status {
             RunStatus::Queued | RunStatus::InProgress | RunStatus::Cancelling => {
                 continue;
