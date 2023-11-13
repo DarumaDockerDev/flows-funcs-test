@@ -78,7 +78,7 @@ async fn delete_thread(thread_id: &str) {
             log::info!("Old thread (ID: {}) deleted.", thread_id);
         }
         Err(e) => {
-            panic!("Failed to delete thread. {:?}", e);
+            log::error!("Failed to delete thread. {:?}", e);
         }
     }
 }
