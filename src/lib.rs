@@ -1,6 +1,7 @@
 use async_openai_wasi::{
     types::{
         CreateMessageRequestArgs, CreateRunRequestArgs, CreateThreadRequestArgs, MessageContent,
+        RunStatus,
     },
     Client,
 };
@@ -12,7 +13,7 @@ use tg_flows::{listen_to_update, update_handler, Telegram, UpdateKind};
 pub async fn on_deploy() {
     logger::init();
 
-    create_thread().await;
+    // create_thread().await;
 
     let telegram_token = std::env::var("telegram_token").unwrap();
     listen_to_update(telegram_token).await;
@@ -70,29 +71,53 @@ async fn run_message(text: String) -> String {
 
     let mut create_run_request = CreateRunRequestArgs::default().build().unwrap();
     create_run_request.assistant_id = assistant_id;
-    let run_object = client
+    let run_id = client
         .threads()
         .runs(&thread_id)
         .create(create_run_request)
         .await
-        .unwrap();
+        .unwrap()
+        .id;
 
-    println!("run object: {run_object:#?}");
+    let mut result = Some("Timeout");
+    for _ in 0..5 {
+        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+        let run_object = client
+            .threads()
+            .runs(&thread_id)
+            .retrieve(run_id.as_str())
+            .await
+            .unwrap();
+        result = match run_object.status {
+            RunStatus::Queued | RunStatus::InProgress | RunStatus::Cancelling => {
+                continue;
+            }
+            RunStatus::RequiresAction => Some("Action required for OpenAI assistant"),
+            RunStatus::Cancelled => Some("Run is cancelled"),
+            RunStatus::Failed => Some("Run is failed"),
+            RunStatus::Expired => Some("Run is expired"),
+            RunStatus::Completed => None,
+        };
+        break;
+    }
 
-    let mut thread_messages = client
-        .threads()
-        .messages(&thread_id)
-        .list(&[("limit", "1")])
-        .await
-        .unwrap();
+    match result {
+        Some(r) => String::from(r),
+        None => {
+            let mut thread_messages = client
+                .threads()
+                .messages(&thread_id)
+                .list(&[("limit", "1")])
+                .await
+                .unwrap();
 
-    println!("thread messages: {thread_messages:#?}");
+            let c = thread_messages.data.pop().unwrap();
+            let c = c.content.into_iter().filter_map(|x| match x {
+                MessageContent::Text(t) => Some(t.text.value),
+                _ => None,
+            });
 
-    let c = thread_messages.data.pop().unwrap();
-    let c = c.content.into_iter().filter_map(|x| match x {
-        MessageContent::Text(t) => Some(t.text.value),
-        _ => None,
-    });
-
-    c.collect()
+            c.collect()
+        }
+    }
 }
