@@ -6,7 +6,7 @@ use openai_flows::{
     chat::{self, ChatModel, ChatOptions, ResponseFormat, ResponseFormatType},
     OpenAIFlows,
 };
-// use sendgrid::v3::*;
+use sendgrid::v3::*;
 
 use serde::Deserialize;
 use serde_json::Value;
@@ -47,36 +47,36 @@ async fn handler() {
 async fn email(_headers: Vec<(String, String)>, qry: HashMap<String, Value>, body: Vec<u8>) {
     logger::init();
 
-    // let receiver = qry.get("receiver").unwrap().as_str().unwrap();
-    // let subject = qry.get("subject").unwrap().as_str().unwrap();
+    let receiver = qry.get("receiver").unwrap().as_str().unwrap();
+    let subject = qry.get("subject").unwrap().as_str().unwrap();
 
-    // let sender = std::env::var("SENDGRID_SENDER").unwrap();
-    // let sg_api_key = std::env::var("SENDGRID_API_KEY").unwrap();
+    let sender = std::env::var("SENDGRID_SENDER").unwrap();
+    let sg_api_key = std::env::var("SENDGRID_API_KEY").unwrap();
 
-    // let mut cool_header = HashMap::with_capacity(2);
-    // cool_header.insert(String::from("x-cool"), String::from("indeed"));
-    // cool_header.insert(String::from("x-cooler"), String::from("cold"));
+    let mut cool_header = HashMap::with_capacity(2);
+    cool_header.insert(String::from("x-cool"), String::from("indeed"));
+    cool_header.insert(String::from("x-cooler"), String::from("cold"));
 
-    // let p = Personalization::new(Email::new(receiver)).add_headers(cool_header);
+    let p = Personalization::new(Email::new(receiver)).add_headers(cool_header);
 
-    // let m = Message::new(Email::new(sender))
-    //     .set_subject(subject)
-    //     .add_content(
-    //         Content::new()
-    //             .set_content_type("text/html")
-    //             .set_value(String::from_utf8_lossy(&body)),
-    //     )
-    //     .add_personalization(p);
+    let m = Message::new(Email::new(sender))
+        .set_subject(subject)
+        .add_content(
+            Content::new()
+                .set_content_type("text/html")
+                .set_value(String::from_utf8_lossy(&body)),
+        )
+        .add_personalization(p);
 
-    // let sender = Sender::new(sg_api_key);
-    // let resp = sender.send(&m).await;
-    let resp = "";
-
-    send_response(
-        200,
-        vec![],
-        format!("assistants: {resp:#?}").into_bytes().to_vec(),
-    );
+    let sender = Sender::new(sg_api_key);
+    match sender.send(&m).await {
+        Ok(resp) => {
+            send_response(200, vec![], format!("{resp:#?}").into_bytes().to_vec());
+        }
+        Err(e) => {
+            send_response(500, vec![], format!("{e:#?}").into_bytes().to_vec());
+        }
+    }
 }
 
 async fn openai(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, body: Vec<u8>) {
