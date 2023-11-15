@@ -1,14 +1,13 @@
+use flowsnet_platform_sdk::logger;
 use std::collections::HashMap;
 
-use async_openai_wasi::{
-    types::{CreateMessageRequestArgs, CreateRunRequestArgs, CreateThreadRequestArgs},
-    Client,
-};
 use http_req::request;
 use openai_flows::{
     chat::{self, ChatModel, ChatOptions, ResponseFormat, ResponseFormatType},
     OpenAIFlows,
 };
+// use sendgrid::v3::*;
+
 use serde::Deserialize;
 use serde_json::Value;
 use webhook_flows::{
@@ -31,7 +30,7 @@ async fn handler() {
         .insert("/get/:city", vec![options(opt), get(query)])
         .unwrap();
     router.insert("/openai", vec![post(openai)]).unwrap();
-    router.insert("/assistant", vec![post(assistant)]).unwrap();
+    router.insert("/email", vec![post(email)]).unwrap();
 
     if let Err(e) = route(router).await {
         match e {
@@ -45,17 +44,38 @@ async fn handler() {
     }
 }
 
-async fn assistant(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, body: Vec<u8>) {
-    let client = Client::new();
+async fn email(_headers: Vec<(String, String)>, qry: HashMap<String, Value>, body: Vec<u8>) {
+    logger::init();
 
-    let query = [("limit", "10")];
+    // let receiver = qry.get("receiver").unwrap().as_str().unwrap();
+    // let subject = qry.get("subject").unwrap().as_str().unwrap();
 
-    let assistants = client.assistants().list(&query).await.unwrap();
+    // let sender = std::env::var("SENDGRID_SENDER").unwrap();
+    // let sg_api_key = std::env::var("SENDGRID_API_KEY").unwrap();
+
+    // let mut cool_header = HashMap::with_capacity(2);
+    // cool_header.insert(String::from("x-cool"), String::from("indeed"));
+    // cool_header.insert(String::from("x-cooler"), String::from("cold"));
+
+    // let p = Personalization::new(Email::new(receiver)).add_headers(cool_header);
+
+    // let m = Message::new(Email::new(sender))
+    //     .set_subject(subject)
+    //     .add_content(
+    //         Content::new()
+    //             .set_content_type("text/html")
+    //             .set_value(String::from_utf8_lossy(&body)),
+    //     )
+    //     .add_personalization(p);
+
+    // let sender = Sender::new(sg_api_key);
+    // let resp = sender.send(&m).await;
+    let resp = "";
 
     send_response(
         200,
         vec![],
-        format!("assistants: {assistants:#?}").into_bytes().to_vec(),
+        format!("assistants: {resp:#?}").into_bytes().to_vec(),
     );
 }
 
