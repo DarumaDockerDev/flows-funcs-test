@@ -14,7 +14,7 @@ pub async fn on_deploy() {
         &GithubLogin::Provided(owner.clone()),
         owner.as_str(),
         repo.as_str(),
-        vec!["issue_comment"],
+        vec!["push", "issue_comment"],
     )
     .await;
 }
