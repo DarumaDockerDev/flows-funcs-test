@@ -69,6 +69,9 @@ async fn handler(payload: EventPayload) {
                 log::debug!("File modified: {}", file_modified);
             }
         }
+        EventPayload::UnknownEvent(_) => {
+            log::debug!("Unknown event");
+        }
         c => {
             log::debug!("{:?}", c);
         }
