@@ -41,6 +41,7 @@ async fn handler(payload: EventPayload) {
         }
         EventPayload::PushEvent(e) => {
             let octo = get_octo(&GithubLogin::Provided(owner.clone()));
+            log::debug!("{:?}", e);
 
             for c in e.commits.iter() {
                 log::debug!("Found commit#{}", c.sha);
@@ -68,6 +69,8 @@ async fn handler(payload: EventPayload) {
                 log::debug!("File modified: {}", file_modified);
             }
         }
-        _ => {}
+        c => {
+            log::debug!("{:?}", c);
+        }
     };
 }
