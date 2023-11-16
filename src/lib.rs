@@ -27,15 +27,47 @@ async fn handler(payload: EventPayload) {
     let owner = std::env::var("GITHUB_OWNER").unwrap();
     let repo = std::env::var("GITHUB_REPO").unwrap();
 
-    if let EventPayload::IssueCommentEvent(e) = payload {
-        let issue_number = e.comment.id.0;
+    match payload {
+        EventPayload::IssueCommentEvent(e) => {
+            let issue_number = e.comment.id.0;
 
-        // installed app login
-        let octo = get_octo(&GithubLogin::Provided(owner.clone()));
+            // installed app login
+            let octo = get_octo(&GithubLogin::Provided(owner.clone()));
 
-        octo.issues(owner.as_str(), repo.as_str())
-            .create_comment_reaction(issue_number, ReactionContent::Rocket)
-            .await
-            .unwrap();
+            octo.issues(owner.as_str(), repo.as_str())
+                .create_comment_reaction(issue_number, ReactionContent::Rocket)
+                .await
+                .unwrap();
+        }
+        EventPayload::PushEvent(e) => {
+            let octo = get_octo(&GithubLogin::Provided(owner.clone()));
+
+            for c in e.commits.iter() {
+                log::debug!("Found commit#{}", c.sha);
+                let mut commits = octo
+                    .repos(owner.as_str(), repo.as_str())
+                    .list_commits()
+                    .sha(&c.sha)
+                    .send()
+                    .await
+                    .unwrap();
+                let commit = commits.items.get_mut(0).unwrap();
+                let file_modified = match commit.files {
+                    Some(_) => {
+                        let files = commit.files.take().unwrap();
+                        files
+                            .iter()
+                            .find(|f| {
+                                println!("{:?}", f);
+                                f.filename == "lib.rs"
+                            })
+                            .is_some()
+                    }
+                    None => false,
+                };
+                log::debug!("File modified: {}", file_modified);
+            }
+        }
+        _ => {}
     };
 }
