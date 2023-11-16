@@ -1,2 +1,1 @@
-S
-X
+TTT stands for Testing!
