@@ -1,3 +1,4 @@
+use airtable_api::{api_key_from_env, Airtable, Record};
 use flowsnet_platform_sdk::logger;
 use std::collections::HashMap;
 
@@ -31,6 +32,7 @@ async fn handler() {
         .unwrap();
     router.insert("/openai", vec![post(openai)]).unwrap();
     router.insert("/email", vec![post(email)]).unwrap();
+    router.insert("/airtable", vec![post(airtable)]).unwrap();
 
     if let Err(e) = route(router).await {
         match e {
@@ -42,6 +44,32 @@ async fn handler() {
             }
         }
     }
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all(deserialize = "snake_case"))]
+struct AirTableFields {
+    Name: String,
+}
+
+async fn airtable(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, _body: Vec<u8>) {
+    logger::init();
+
+    // Initialize the Airtable client.
+    let airtable = Airtable::new(api_key_from_env(), "appLjd0KmtnCf3l0r", "");
+
+    // Get the current records from a table.
+    let records: Vec<Record<AirTableFields>> = airtable
+        .list_records("APITest", "Grid view", vec!["Name"])
+        .await
+        .unwrap();
+
+    // Iterate over the records.
+    for (i, record) in records.clone().iter().enumerate() {
+        println!("{} - {:?}", i, record);
+    }
+
+    send_response(200, vec![], b"".to_vec());
 }
 
 async fn email(_headers: Vec<(String, String)>, qry: HashMap<String, Value>, body: Vec<u8>) {
