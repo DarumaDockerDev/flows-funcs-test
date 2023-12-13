@@ -33,6 +33,7 @@ async fn handler() {
     router.insert("/openai", vec![post(openai)]).unwrap();
     router.insert("/email", vec![post(email)]).unwrap();
     router.insert("/airtable", vec![post(airtable)]).unwrap();
+    router.insert("/mediapipe", vec![post(mediapipe)]).unwrap();
 
     if let Err(e) = route(router).await {
         match e {
@@ -44,6 +45,23 @@ async fn handler() {
             }
         }
     }
+}
+
+async fn mediapipe(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, body: Vec<u8>) {
+    logger::init();
+    let model_path = std::env::var("MODEL_PATH").unwrap();
+    let classification_result = mediapipe_rs::tasks::vision::ImageClassifierBuilder::new()
+        .max_results(1) // set max result
+        .build_from_file(model_path)
+        .unwrap() // create a image classifier
+        .classify(&image::load_from_memory(&body).unwrap())
+        .unwrap(); // do inference and generate results
+
+    send_response(
+        200,
+        vec![],
+        format!("{}", classification_result).as_bytes().to_vec(),
+    );
 }
 
 #[derive(Clone, Debug, Deserialize)]

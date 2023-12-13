@@ -21,3 +21,5 @@ openai-flows = "0.9"
 async-openai-wasi = "0.16"
 sendgrid-wasi = "0.19"
 airtable-api-wasi = "0.2"
+image = "0.24.7"
+mediapipe-rs = { path = "../../WasmEdge/mediapipe-rs" }
