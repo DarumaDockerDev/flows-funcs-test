@@ -21,3 +21,4 @@ openai-flows = "0.9"
 async-openai-wasi = "0.16"
 sendgrid-wasi = "0.19"
 airtable-api-wasi = "0.2"
+reqwest_wasi = { version = "0.11", features = ["wasmedge-tls"] }

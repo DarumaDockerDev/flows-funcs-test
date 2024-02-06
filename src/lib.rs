@@ -2,7 +2,11 @@ use airtable_api::{api_key_from_env, Airtable, Record};
 use flowsnet_platform_sdk::logger;
 use std::collections::HashMap;
 
-use http_req::request;
+// use http_req::request;
+use http_req::{
+    request::{self, Method, Request},
+    uri::Uri,
+};
 use openai_flows::{
     chat::{self, ChatModel, ChatOptions, ResponseFormat, ResponseFormatType},
     OpenAIFlows,
@@ -33,6 +37,7 @@ async fn handler() {
     router.insert("/openai", vec![post(openai)]).unwrap();
     router.insert("/email", vec![post(email)]).unwrap();
     router.insert("/airtable", vec![post(airtable)]).unwrap();
+    router.insert("/test", vec![get(test)]).unwrap();
 
     if let Err(e) = route(router).await {
         match e {
@@ -44,6 +49,39 @@ async fn handler() {
             }
         }
     }
+}
+
+async fn test(_headers: Vec<(String, String)>, _qry: HashMap<String, Value>, _body: Vec<u8>) {
+    logger::init();
+
+    let query = format!(
+        "{}?chain={:#x}",
+        "0x70655c1c0D7Ef1273D17E5610a2079E7465F0FF6", 80001u64
+    )
+    .to_string();
+    let api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImEyZjZkMDAxLTQzODktNGZhMS04MzQxLTIyZjNlYTBkMGE0NiIsIm9yZ0lkIjoiMzY3OTk5IiwidXNlcklkIjoiMzc4MjEyIiwidHlwZUlkIjoiYWE5MzRjMWItODI0Zi00NGQ5LWI2OTYtNjMwOWE3YjJkYzQ5IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MDI0NDc3MTQsImV4cCI6NDg1ODIwNzcxNH0.r5211T8RJZI9j0gQDWNR0oflRSHMGz1AOGwl1RRGzlc";
+    log::info!("get_request: {} {}", query, api_key);
+    let url = format!("https://deep-index.moralis.io/api/v2.2/{}", query);
+
+    let addr = Uri::try_from(url.as_str()).unwrap();
+    let mut writer = Vec::new();
+
+    let response = Request::new(&addr)
+        .method(Method::GET)
+        .header("Connection", "Close")
+        .header("accept", "application/json")
+        .header("X-API-Key", api_key)
+        .send(&mut writer)
+        .unwrap();
+
+    send_response(
+        response.status_code().into(),
+        vec![(
+            String::from("content-type"),
+            String::from("application/json"),
+        )],
+        writer.to_vec(),
+    );
 }
 
 #[derive(Clone, Debug, Deserialize)]
