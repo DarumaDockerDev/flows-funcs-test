@@ -19,3 +19,4 @@ log = "0.4.20"
 chrono = "0.4.31"
 twilio_wasi = "1"
 tencentcloud-sdk-sms-wasi = "0.2"
+whatsapp-cloud-api = { package = "whatsapp-cloud-api-wasi", version = "0.5.3", git = "https://github.com/flows-network/whatsapp-cloud-api-rs.git" }
