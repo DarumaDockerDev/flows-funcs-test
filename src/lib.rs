@@ -12,6 +12,10 @@ use tencentcloud_sdk_sms::{
     credentials::Credential,
 };
 use twilio_wasi::{Client, OutboundMessage};
+use whatsapp_cloud_api::models::{
+    Component, ComponentSubType, ComponentType, Message, Parameter, Template,
+};
+use whatsapp_cloud_api::WhatasppClient;
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
@@ -24,6 +28,7 @@ async fn handler() {
     let mut router = Router::new();
     router.insert("/twilio", vec![post(twilio)]).unwrap();
     router.insert("/tencent", vec![post(tencent)]).unwrap();
+    router.insert("/whatsapp", vec![post(whatsapp)]).unwrap();
     if let Err(e) = route(router).await {
         match e {
             RouteError::NotFound => {
@@ -130,6 +135,55 @@ async fn twilio(_headers: Vec<(String, String)>, qry: HashMap<String, Value>, _b
                 .map_err(|x| format!("{:?}", x))
         }
         None => Err(String::from("No 'text' or 'to' in query")),
+    };
+
+    match resp {
+        Ok(r) => send_response(
+            200,
+            vec![(
+                String::from("content-type"),
+                String::from("text/html; charset=UTF-8"),
+            )],
+            format!("{:?}", r).as_bytes().to_vec(),
+        ),
+        Err(e) => send_response(
+            400,
+            vec![(
+                String::from("content-type"),
+                String::from("text/html; charset=UTF-8"),
+            )],
+            e.as_bytes().to_vec(),
+        ),
+    }
+}
+
+async fn whatsapp(_headers: Vec<(String, String)>, qry: HashMap<String, Value>, _body: Vec<u8>) {
+    flowsnet_platform_sdk::logger::init();
+
+    let text = qry.get("code").unwrap_or(&Value::Null).as_str();
+    let to = qry.get("to").unwrap_or(&Value::Null).as_str();
+
+    let resp = match text.and(to) {
+        Some(_) => {
+            let access_token = std::env::var("WHATSAPP_ACCESS_TOKEN").unwrap();
+            let phone_number_id = std::env::var("WHATSAPP_PHONE_NUMBER_ID").unwrap();
+
+            let template_name = std::env::var("WHATSAPP_TEMPLATE_NAME").unwrap();
+            let language = std::env::var("WHATSAPP_LANGUAGE").unwrap();
+            let parameters = Vec::from([Parameter::from_text(&text.unwrap())]);
+            let components = Vec::from([
+                Component::with_parameters(ComponentType::Body, parameters.clone()),
+                Component::for_button(ComponentType::Button, ComponentSubType::Url, parameters, 0),
+            ]);
+            let template = Template::with_components(&template_name, &language, components);
+            let message = Message::from_template(&to.unwrap(), template, None);
+            let client = WhatasppClient::new(&access_token, &phone_number_id);
+            client
+                .send_message(&message)
+                .await
+                .map_err(|x| format!("{:?}", x))
+        }
+        None => Err(String::from("No 'code' or 'to' in query")),
     };
 
     match resp {
