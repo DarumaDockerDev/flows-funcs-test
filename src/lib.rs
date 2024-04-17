@@ -162,11 +162,15 @@ async fn whatsapp(_headers: Vec<(String, String)>, qry: HashMap<String, Value>, 
 
     let text = qry.get("code").unwrap_or(&Value::Null).as_str();
     let to = qry.get("to").unwrap_or(&Value::Null).as_str();
+    let phone_number_id = qry.get("phone_number_id").unwrap_or(&Value::Null).as_str();
 
     let resp = match text.and(to) {
         Some(_) => {
             let access_token = std::env::var("WHATSAPP_ACCESS_TOKEN").unwrap();
-            let phone_number_id = std::env::var("WHATSAPP_PHONE_NUMBER_ID").unwrap();
+            let phone_number_id = match phone_number_id {
+                Some(pni) => pni.to_string(),
+                None => std::env::var("WHATSAPP_PHONE_NUMBER_ID").unwrap(),
+            };
 
             let template_name = std::env::var("WHATSAPP_TEMPLATE_NAME").unwrap();
             let language = std::env::var("WHATSAPP_LANGUAGE").unwrap();
