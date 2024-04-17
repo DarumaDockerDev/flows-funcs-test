@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde_json::Value;
 use webhook_flows::{
     create_endpoint, request_handler,
-    route::{post, route, RouteError, Router},
+    route::{get, post, route, RouteError, Router},
     send_response,
 };
 
@@ -28,7 +28,9 @@ async fn handler() {
     let mut router = Router::new();
     router.insert("/twilio", vec![post(twilio)]).unwrap();
     router.insert("/tencent", vec![post(tencent)]).unwrap();
-    router.insert("/whatsapp", vec![post(whatsapp)]).unwrap();
+    router
+        .insert("/whatsapp", vec![get(whatsapp), post(whatsapp)])
+        .unwrap();
     if let Err(e) = route(router).await {
         match e {
             RouteError::NotFound => {
