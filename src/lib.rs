@@ -1,7 +1,10 @@
 use flowsnet_platform_sdk::logger;
 use github_flows::{
     event_handler, get_octo, listen_to_event,
-    octocrab::models::{events::payload::EventPayload, reactions::ReactionContent},
+    octocrab::models::{
+        reactions::ReactionContent,
+        webhook_events::{WebhookEvent, WebhookEventPayload},
+    },
     GithubLogin,
 };
 
@@ -20,15 +23,17 @@ pub async fn on_deploy() {
 }
 
 #[event_handler]
-async fn handler(payload: EventPayload) {
+async fn handler(payload: Result<WebhookEvent, serde_json::Error>) {
     logger::init();
     log::debug!("running github issue comment handler");
+
+    let payload = payload.unwrap();
 
     let owner = std::env::var("GITHUB_OWNER").unwrap();
     let repo = std::env::var("GITHUB_REPO").unwrap();
 
-    match payload {
-        EventPayload::IssueCommentEvent(e) => {
+    match payload.specific {
+        WebhookEventPayload::IssueComment(e) => {
             let issue_number = e.comment.id.0;
 
             // installed app login
@@ -39,16 +44,16 @@ async fn handler(payload: EventPayload) {
                 .await
                 .unwrap();
         }
-        EventPayload::PushEvent(e) => {
+        WebhookEventPayload::Push(e) => {
             let octo = get_octo(&GithubLogin::Provided(owner.clone()));
             log::debug!("{:?}", e);
 
             for c in e.commits.iter() {
-                log::debug!("Found commit#{}", c.sha);
+                log::debug!("Found commit#{}", c.id);
                 let mut commits = octo
                     .repos(owner.as_str(), repo.as_str())
                     .list_commits()
-                    .sha(&c.sha)
+                    .sha(&c.id)
                     .send()
                     .await
                     .unwrap();
@@ -69,7 +74,7 @@ async fn handler(payload: EventPayload) {
                 log::debug!("File modified: {}", file_modified);
             }
         }
-        EventPayload::UnknownEvent(_) => {
+        WebhookEventPayload::Unknown(_) => {
             log::debug!("Unknown event");
         }
         c => {
